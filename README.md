@@ -18,14 +18,14 @@ This layer depends on:
     URI: git://git.yoctoproject.org/poky
     layers: meta, meta-poky, meta-yocto-bsp
     branch: dunfell
-    revision: bba323389749ec3e306509f8fb12649f031be152
-    (tag: dunfell-23.0.14)
+    revision: aa0073041806c9f417a33b0b7f747d2a86289eda
+    (tag: dunfell-23.0.21)
     (Need to cherry-pick a commit: git cherry-pick 9e444)
 
     URI: git://git.openembedded.org/meta-openembedded
     layers: meta-oe, meta-python, meta-multimedia
     branch: dunfell
-    revision: ec978232732edbdd875ac367b5a9c04b881f2e19
+    revision: 7952135f650b4a754e2255f5aa03973a32344123
 
     URI: http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
     layers: meta-gplv2
@@ -46,7 +46,7 @@ This layer depends on:
     URI: https://git.yoctoproject.org/git/meta-virtualization
     layers: meta-virtualization
     branch: dunfell
-    revision: c5f61e547b90aa8058cf816f00902afed9c96f72
+    revision: a63a54df3170fed387f810f23cdc2f483ad587df
 
 ## Build Instructions
 
@@ -61,67 +61,63 @@ Below git configuration is required:
 
 Download all Yocto related public source to prepare the build environment as below.
 ```bash
-  git clone https://git.yoctoproject.org/git/poky
-  cd poky
-  git checkout dunfell-23.0.14
-  git cherry-pick 9e444
-  cd ..
+git clone -b dunfell https://git.yoctoproject.org/git/poky
+cd poky
+git reset --hard dunfell-23.0.21
+# TODO: cherry-pick?
+cd ..
 
-  git clone https://github.com/openembedded/meta-openembedded
-  cd meta-openembedded
-  git checkout ec978232732edbdd875ac367b5a9c04b881f2e19
-  cd ..
+git clone -b dunfell https://github.com/openembedded/meta-openembedded
+cd meta-openembedded
+git reset --hard 7952135f650b4a754e2255f5aa03973a32344123
+cd ..
 
-  git clone https://git.yoctoproject.org/git/meta-gplv2
-  cd meta-gplv2
-  git checkout 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
+git clone -b dunfell https://git.yoctoproject.org/git/meta-gplv2
+cd meta-gplv2
+git reset --hard 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
+cd ..
 
-  git clone  https://github.com/renesas-rz/meta-renesas.git
-  cd meta-renesas
-  git checkout BSP-3.0.0
-  cd ..
+git clone -b dunfell/rz https://github.com/renesas-rz/meta-renesas.git
+cd meta-renesas
+git reset --hard BSP-3.0.3
+cd ..
 
-  git clone  https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git
-  cd meta-solidrun-arm-rzg2lc
-  git checkout dunfell
-  cd ..
+git clone -b dunfell https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git
+cd meta-solidrun-arm-rzg2lc
+cd ..
 
-  git clone  https://github.com/meta-qt5/meta-qt5.git
-  cd meta-qt5
-  git checkout -b tmp c1b0c9f546289b1592d7a895640de103723a0305
-  cd ..
+git clone -b dunfell https://github.com/meta-qt5/meta-qt5.git
+cd meta-qt5
+git reset --hard c1b0c9f546289b1592d7a895640de103723a0305
+cd ..
 
-  git clone  https://git.yoctoproject.org/git/meta-virtualization -b dunfell
-  cd meta-virtualization
-  git checkout c5f61e547b90aa8058cf816f00902afed9c96f72
-  cd ..
+git clone -b dunfell https://git.yoctoproject.org/git/meta-virtualization
+cd meta-virtualization
+git checkout a63a54df3170fed387f810f23cdc2f483ad587df
+cd ..
 ```
 
-Download proprietary graphics and multimedia drivers from Renesas, include:
-- proprietary_mmp.tar.gz
-- vspmfilter.tar.xz
-(Graphic drivers are required for Wayland. Multimedia drivers are optional)
+Download proprietary graphics drivers and/or multimedia codecs from [Renesas](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package):
+- RZ MPU Graphics Library for RZ/G2L and RZ/G2LC v1.0.5
+- RZ MPU Video Codec Library for RZ/G2L v1.1.0
+(Graphic drivers are required for Wayland, Codecs optional)
 
-[Optional] If you need GPU/Codec support, or build Weston image, this step helps to copy them to build environment. Copy file proprietary_mmp.tar.gz and vspmfilter.tar.xz to $WORK and do below commands.
+After downloading the proprietary packages, please decompress - then put meta-rz-features folder at $WORK.
+
+Optionally a Docker environment can be used for the build:
 ```bash
-   tar -xf proprietary_mmp.tar.gz
-   cd proprietary_mmp
-   ./copy_gfx_mmp.sh ../meta-renesas
-   cd ..
-
-   cp vspmfilter.tar.xz meta-renesas/recipes-common/recipes-multimedia/gstreamer/gstreamer1.0-plugin-vspmfilter
-
+docker pull crops/poky:ubuntu-20.04
+docker run --rm -it -v ${PWD}:/work crops/poky:ubuntu-20.04 --workdir=/work
 ```
 
 Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:
 ```bash
-  source poky/oe-init-build-env
+TEMPLATECONF=$PWD/meta-solidrun-arm-rzg2lc/docs/template/conf/rzg2lc-solidrun source poky/oe-init-build-env build
 ```
 
-Prepare default configuration files. :
-```bash
-  cp $WORK/meta-solidrun-arm-rzg2lc/docs/template/conf/rzg2lc-solidrun/*.conf ./conf/
-```
+Review / Edit default configuration files:
+- `conf/bblayers.conf`
+- `conf/local.conf`
 
 Build the target file system image using bitbake:
 ```bash
@@ -143,23 +139,21 @@ Images generated:
 It is possible to change some build configs as below:
 * GPLv3: choose to not allow, or allow, GPLv3 packages
   * **Non-GPLv3 (default):** not allow GPLv3 license. All recipes that has GPLv3 license will be downgrade to older version that has alternative license (done by meta-gplv2). In this setting customer can ignore the risk of strict license GPLv3
-  ```
-  INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
-  ```
+    `INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"`
   * Allow-GPLv3: allow GPLv3 license. If user is fine with strict copy-left license GPLv3, can use this setting to get newer software version.
-  ```
-  #INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
-  ```
-* CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community. You can select the value "1" or "0" for CIP_CORE variable
-  ```
-  CIP_CORE = "1"
-  ```
+    `#INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"`
+* CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community. You can select by changing "CIP_MODE".
+  * **Buster (default):** use as many packages from CIP Core Buster as possible.
+    `CIP_MODE = "Buster"`
+  * Bullseye: use as many packages from CIP Core Bullseye.
+    `CIP_MODE = "Bullseye"`
+  * None CIP Core: not use CIP Core at all, use all default version from Yocto 3.1 Dunfell
+    `CIP_MODE = "None" or unset CIP_MODE`
+
 * QT Demo: choose QT5 Demonstration to build with core-image-qt. QT5 Demos are some applications to demonstrate QT5 framework.
   * Unset QT_DEMO (default): all QT5 Demos are not built with core-image-qt.
-  ```
-  #QT_DEMO = "1"
-  ```
+    `#QT_DEMO = "1"`
   * Allow QT_DEMO: all QT5 Demos are built and included in core-image-qt.
-  ```
-  QT_DEMO = "1"
-  ```
+    `QT_DEMO = "1"`
+* Realtime Linux: choose realtime characteristic of Linux kernel to build with. You can enable this feature by setting the value "1" to IS_RT_BSP variable in local.conf:
+  `IS_RT_BSP = "1"`
