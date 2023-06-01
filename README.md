@@ -64,7 +64,6 @@ Download all Yocto related public source to prepare the build environment as bel
 git clone -b dunfell https://git.yoctoproject.org/git/poky
 cd poky
 git reset --hard dunfell-23.0.21
-# TODO: cherry-pick?
 cd ..
 
 git clone -b dunfell https://github.com/openembedded/meta-openembedded
@@ -119,11 +118,16 @@ Review / Edit default configuration files:
 - `conf/bblayers.conf`
 - `conf/local.conf`
 
-Build the target file system image using bitbake:
+Build a target using bitbake, e.g.:
 ```bash
-  bitbake core-image-<target>
+bitbake core-image-bsp
 ```
-\<target\>:bsp, weston, qt
+
+Valid targets:
+- firmware-pack: atf + u-boot
+- core-image-bsp: cli image
+- core-image-weston: graphical image
+- core-image-qt: graphical image including qt
 
 After completing the images for the target machine will be available in the output
 directory _'tmp/deploy/images/\<supported board name\>'_.
@@ -133,6 +137,7 @@ Images generated:
 * DTB for target machine
 * core-image-\<target\>-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
 * core-image-\<target\>-\<machine name\>.ext4  (rootfs ext4 format)
+* core-image-\<target\>-\<machine name\>.wic  (bootable sdcard image)
 
 ## Build configs
 
