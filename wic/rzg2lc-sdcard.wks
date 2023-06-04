@@ -24,4 +24,5 @@
 part bootparam --source rawcopy --sourceparams="file=bl2_bp_esd-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 1s
 part bl2 --source rawcopy --sourceparams="file=bl2-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 8s
 part u-boot --source rawcopy --sourceparams="file=fip-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 128s
-part / --source rootfs --ondisk mmcblk --fstype=ext4 --label rootfs --align 4 --offset 8192s --use-uuid
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --use-uuid --active --align 4 --offset 8192s --extra-space 16M --sourceparams="loader=u-boot"
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs --use-uuid --align 4

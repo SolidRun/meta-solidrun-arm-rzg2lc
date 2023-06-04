@@ -16,4 +16,5 @@ file://0012-Allow-usage-of-random-MAC-addresses.patch \
 file://0013-Add-support-for-the-tlv_eeprom-command.patch \
 file://0014-Support-reading-MAC-address-for-ravb-driver.patch \
 file://0015-add-carrier-eeprom-support-for-rzg2lc-solidrun.patch \
+file://0016-add-ditroboot-support-for-rzg2lc-solidrun.patch \
 "
