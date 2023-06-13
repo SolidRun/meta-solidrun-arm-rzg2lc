@@ -162,3 +162,4 @@ It is possible to change some build configs as below:
     `QT_DEMO = "1"`
 * Realtime Linux: choose realtime characteristic of Linux kernel to build with. You can enable this feature by setting the value "1" to IS_RT_BSP variable in local.conf:
   `IS_RT_BSP = "1"`
+ 
