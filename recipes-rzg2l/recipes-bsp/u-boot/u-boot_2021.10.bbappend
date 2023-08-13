@@ -19,4 +19,7 @@ SRC_URI_append = " \
     file://0016-add-ditroboot-support-for-rzg2lc-solidrun.patch \
     file://0017-Fixed-reset-for-rzg2lc-solidrun-using-wdt.patch \
     file://0018-Fixed-usb-for-rzg2lc-solidrun.patch \
+    file://0019-Set-SD0_DEV_SEL_SW-signal-in-rzg2lc-solidrun-dts.patch \
+    file://0020-Fix-USB-VBUS-signal-types.patch \
+    file://0021-add-support-to-select-eMMC-SD-during-boot-rzg2lc.patch \
 "

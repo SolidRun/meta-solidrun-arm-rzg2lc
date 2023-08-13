@@ -28,6 +28,9 @@ SRC_URI += "\
     file://0021-Add-bluetooth-support-for-rzg2lc-som.patch \
     file://0022-Fix-ethernet-reconnect-isuue-on-rzg2lc-hummingboard.patch \
     file://0023-RZ-G2LC-som-sd-card-is-non-removable.patch \
+    file://0024-rz-g2lc-fix-pmic-setup-increase-wifi-bluetooth-stabi.patch \
+    file://0025-rz-g2lc-fix-vbus-signal-types.patch \
+    file://0026-rzg2lc-edit-emmc-sd-settings.patch \
 "
 
 # Applying custom kernel defconfig 
