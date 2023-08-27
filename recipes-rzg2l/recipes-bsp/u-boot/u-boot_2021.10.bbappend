@@ -22,4 +22,13 @@ SRC_URI_append = " \
     file://0019-Set-SD0_DEV_SEL_SW-signal-in-rzg2lc-solidrun-dts.patch \
     file://0020-Fix-USB-VBUS-signal-types.patch \
     file://0021-add-support-to-select-eMMC-SD-during-boot-rzg2lc.patch \
+    file://0022-add-rzg2l-soldirun-board-support.patch \
+    file://0023-rzg2l_defconfig-set-the-default-fdtfile-to-rzg2l-hum.patch \
+    file://0024-rzg2l-set-memory-size-and-eth-pinctl-in-rzg2l-dts.patch \
+    file://0025-rzg2l-add-eeprom-support.patch \
+    file://0026-rzg2l-solidrun-som-usb-support.patch \
+    file://0027-rzg2l-fix-phy1-node-name-in-rzg2l-solidrun.dts.patch \
+    file://0028-rzg2l-set-eth1-as-default-interface-in-u-boot.patch \
+    file://0029-tlv-lib-support.patch \
+    file://0030-g2l-g2lc-Completed-g2l-support-tlv-carrier-detect-co.patch \
 "

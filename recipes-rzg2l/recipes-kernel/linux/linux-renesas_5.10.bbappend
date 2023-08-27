@@ -31,6 +31,22 @@ SRC_URI += "\
     file://0024-rz-g2lc-fix-pmic-setup-increase-wifi-bluetooth-stabi.patch \
     file://0025-rz-g2lc-fix-vbus-signal-types.patch \
     file://0026-rzg2lc-edit-emmc-sd-settings.patch \
+    file://0027-add-mxl8611x-phy-driver-support.patch \
+    file://0028-eidt-mxl-8611x-net-phy-modify-rx-tx-default-delays.patch \
+    file://0029-add-rzg2l-hummingboard-ripple-dtb-board-support.patch \
+    file://0030-add-rzg2l-hummingboard-ripple.dtb-to-renesas-dtb-list.patch \
+    file://0031-rzg2l-humminboard-ripple-update-dts.patch \
+    file://0032-add-rzg2l-hummingbaord-tutus-dts-support.patch \
+    file://0033-add-rzg2l-hummingbaord-tutus.dtb-to-renesas-dtbs-lis.patch \
+    file://0034-fix-rzg2l-eeprom-settings.patch \
+    file://0035-rzg2l-HB-Tutus-fix-LEDs-settings-and-enable-eMMC.patch \
+    file://0036-rzg2l-HB_ripple-enable-eMMC-by-default.patch \
+    file://0037-Fix-usb-regulators-for-RZG2L-SOM.patch \
+    file://0038-rzg2l-hummingboard-ripple-disable-eth1.patch \
+    file://0039-add-rzg2l-hummingboard-extended-dts-support.patch \
+    file://0040-add-rzg2l-hummingboard-extended-dts-support.patch \
+    file://0041-ravb-Fix-NETDEV-WATCHDOG-eth1-ravb-transmit-queue-0-.patch \
+    file://0042-Unifying-RZG2L-RZG2LC-device-trees.patch \
 "
 
 # Applying custom kernel defconfig 
@@ -41,3 +57,4 @@ do_patch_append() {
 }
 
 COMPATIBLE_MACHINE_rzg2lc-hummingboard = "(rzg2lc-hummingboard)"
+COMPATIBLE_MACHINE_rzg2l-hummingboard = "(rzg2l-hummingboard)"
