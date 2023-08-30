@@ -289,7 +289,7 @@ DISTRO_FEATURES_remove = " x11"
 #  - Bullseye          : build all supported Debian 11 Bullseye recipes
 #  - Not set (or different with above): not use CIP Core, use default packages version in Yocto
 
-CIP_MODE = "Buster"
+# CIP_MODE = "Buster"
 
 INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
 

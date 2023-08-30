@@ -45,8 +45,9 @@ SRC_URI += "\
     file://0038-rzg2l-hummingboard-ripple-disable-eth1.patch \
     file://0039-add-rzg2l-hummingboard-extended-dts-support.patch \
     file://0040-add-rzg2l-hummingboard-extended-dts-support.patch \
-    file://0041-ravb-Fix-NETDEV-WATCHDOG-eth1-ravb-transmit-queue-0-.patch \
-    file://0042-Unifying-RZG2L-RZG2LC-device-trees.patch \
+    file://0041-Unifying-RZG2L-RZG2LC-device-trees.patch \
+    file://0042-rzg2l-add-SW1-Button-support-to-rzg2l-hummingboard-t.patch \
+    file://0043-rzg2l-remove-pmic-from-the-dts.patch \
 "
 
 # Applying custom kernel defconfig 

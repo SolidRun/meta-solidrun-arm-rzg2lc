@@ -5,7 +5,7 @@ This is a Yocto build layer(version:dunfell) that provides support for SolidRun'
 Currently the following boards and MPUs are supported:
 
 - Board: RZG2LC HummingBoard RZ/G2LC Kit / MPU: R9A77G044C (RZ/G2LC)
-- Board: RZG2LC SOM / MPU: R9A77G044C (RZ/G2LC)
+- Board: RZG2L HummingBoard RZ/G2L Kit / MPU: R9A77G044L (RZ/G2L)
 
 ## Patches
 
@@ -35,7 +35,7 @@ This layer depends on:
     URI: https://github.com/renesas-rz/meta-renesas.git
     layers: meta-renesas
     branch: dunfell/rz
-    revision: 852c67f90fcdaf80a5727589cb7e41f7300cfa04
+    revision: BSP-3.0.4
 
     (Optional: core-image-qt)
     URI: https://github.com/meta-qt5/meta-qt5.git
@@ -78,7 +78,7 @@ cd ..
 
 git clone -b dunfell/rz https://github.com/renesas-rz/meta-renesas.git
 cd meta-renesas
-git reset --hard BSP-3.0.3
+git reset --hard BSP-3.0.4
 cd ..
 
 git clone -b dunfell https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git
