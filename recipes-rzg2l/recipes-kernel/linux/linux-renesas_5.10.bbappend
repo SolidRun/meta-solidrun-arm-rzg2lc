@@ -47,7 +47,10 @@ SRC_URI += "\
     file://0040-add-rzg2l-hummingboard-extended-dts-support.patch \
     file://0041-Unifying-RZG2L-RZG2LC-device-trees.patch \
     file://0042-rzg2l-add-SW1-Button-support-to-rzg2l-hummingboard-t.patch \
-    file://0043-rzg2l-remove-pmic-from-the-dts.patch \
+    file://0043-rzv2l-add-HB-extended-and-HB-ripple-dts-support.patch \
+    file://0044-rzv2l-add-HB-extended-and-HB-ripple-to-renesas-dtbs.patch \
+    file://0045-sr-som-Fix-mipi-hdmi-bridge.patch \
+    file://0046-Fix-model-naming-typo-in-the-dts.patch \
 "
 
 # Applying custom kernel defconfig 
@@ -59,3 +62,6 @@ do_patch_append() {
 
 COMPATIBLE_MACHINE_rzg2lc-hummingboard = "(rzg2lc-hummingboard)"
 COMPATIBLE_MACHINE_rzg2l-hummingboard = "(rzg2l-hummingboard)"
+COMPATIBLE_MACHINE_rzv2l-hummingboard = "(rzv2l-hummingboard)"
+
+

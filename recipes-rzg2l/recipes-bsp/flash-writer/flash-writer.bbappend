@@ -18,4 +18,12 @@ do_compile_prepend() {
 		export DDR_SIZE=1GB_1PCS
 		export SWIZZLE=T1BC
 	fi
+
+	if [ "${MACHINE}" = "rzv2l-hummingboard" ]; then
+		export FILENAME_ADD=_RZV2L_HUMMINGBOARD
+		export DEVICE=RZV2L
+		export DDR_TYPE=DDR4
+		export DDR_SIZE=2GB_1PCS
+		export SWIZZLE=T1BC
+	fi
 }

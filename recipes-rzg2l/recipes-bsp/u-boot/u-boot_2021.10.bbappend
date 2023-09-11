@@ -33,5 +33,6 @@ SRC_URI_append = " \
     file://0030-g2l-g2lc-Completed-g2l-support-tlv-carrier-detect-co.patch \
     file://0031-ravb-support-multiple-interfaces.patch \
     file://0032-sr-rzg2l-fix-eth0-pinmux.patch \
-    file://0033-rzg2l-Add-pmic-initialization.patch \
+    file://0033-add-RZ-V2L-SR-SOM-board-support.patch \
+    file://0034-Updated-rzg-common-remove-implicit-declarations.patch \
 "
