@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+
+  <default sync-j="4"/>
+
+  <remote fetch="https://git.yoctoproject.org/git" name="poky"/>
+  <remote fetch="https://github.com/openembedded" name="meta-openembedded"/>
+  <remote fetch="https://git.yoctoproject.org/git"  name="meta-gplv2"/>
+  <remote fetch="https://github.com/renesas-rz"  name="meta-renesas.git"/>
+  <remote fetch="https://github.com/SolidRun" name="meta-solidrun-arm-rzg2lc.git"/>
+  <remote fetch="https://github.com/meta-qt5" name="meta-qt5.git"/>
+  <remote fetch="https://git.yoctoproject.org/git" name="meta-virtualization"/>
+
+
+  <project name="poky" path="sources/poky" remote="poky" revision="aa0073041806c9f417a33b0b7f747d2a86289eda" upstream="dunfell"/>
+  <project name="meta-openembedded" path="sources/meta-openembedded" remote="meta-openembedded" revision="7952135f650b4a754e2255f5aa03973a32344123" upstream="dunfell"/>
+  <project name="meta-gplv2" path="sources/meta-gplv2" remote="meta-gplv2" revision="60b251c25ba87e946a0ca4cdc8d17b1cb09292ac" upstream="dunfell"/>
+  <project name="meta-renesas" path="sources/meta-renesas" remote="meta-renesas.git" revision="e5f7055d78ff0219932557f25645024f35ac5d9a" upstream="dunfell/rz"/>
+  <project name="meta-solidrun-arm-rzg2lc" path="sources/meta-solidrun-arm-rzg2lc" remote="meta-solidrun-arm-rzg2lc.git" revision="dunfell"/>
+  <project name="meta-qt5" path="sources/meta-qt5" remote="meta-qt5.git" revision="c1b0c9f546289b1592d7a895640de103723a0305" upstream="dunfell"/>
+  <project name="meta-virtualization" path="sources/meta-virtualization" remote="meta-virtualization" revision="a63a54df3170fed387f810f23cdc2f483ad587df" upstream="dunfell"/>
+   
+</manifest>
