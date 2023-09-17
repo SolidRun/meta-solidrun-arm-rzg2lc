@@ -51,14 +51,12 @@ SRC_URI += "\
     file://0044-rzv2l-add-HB-extended-and-HB-ripple-to-renesas-dtbs.patch \
     file://0045-sr-som-Fix-mipi-hdmi-bridge.patch \
     file://0046-Fix-model-naming-typo-in-the-dts.patch \
+    file://1001-HB_EXT-add-imx219-camera.patch \
+    file://imx219.c \
 "
 
 # Applying custom kernel defconfig 
-SRC_URI += "file://kernel.extra"
-
-do_patch_append() {
-    cat ${WORKDIR}/kernel.extra >> ${S}/arch/arm64/configs/defconfig
-}
+SRC_URI += "file://kernel_extra.cfg"
 
 COMPATIBLE_MACHINE_rzg2lc-hummingboard = "(rzg2lc-hummingboard)"
 COMPATIBLE_MACHINE_rzg2l-hummingboard = "(rzg2l-hummingboard)"
