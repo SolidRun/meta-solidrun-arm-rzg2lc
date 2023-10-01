@@ -4,7 +4,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI_remove_rzg2l = "file://0002-Workaround-GPU-driver-remove-power-domains-of-GPU-no.patch"
 SRC_URI_remove_rzv2l = "file://0002-Workaround-GPU-driver-remove-power-domains-v2l.patch"
 
-SRC_URI += "\
+SRC_URI_append = " \
     file://0001-add-rzg2lc-hummingbaord-DTS-support.patch \
     file://0002-add-rzg2lc-hummingbaord.dtb-to-renesas-DTBs-list.patch \
     file://0003-modify-RZ-G2LC-HummingBoard-dts.patch \
@@ -51,12 +51,18 @@ SRC_URI += "\
     file://0044-rzv2l-add-HB-extended-and-HB-ripple-to-renesas-dtbs.patch \
     file://0045-sr-som-Fix-mipi-hdmi-bridge.patch \
     file://0046-Fix-model-naming-typo-in-the-dts.patch \
-    file://1001-HB_EXT-add-imx219-camera.patch \
-    file://imx219.c \
+    file://0047-HB_EXT-add-imx219-camera.patch \
+"
+
+# Applying DRP-AI patch if needed
+SRC_URI_append = " \
+    ${@bb.utils.contains('BBFILE_COLLECTIONS', 'rz-drpai', 'file://1001-RZ-V2L-Add-DRP-AI-node.patch', '', d)} \
 "
 
 # Applying custom kernel defconfig 
-SRC_URI += "file://kernel_extra.cfg"
+SRC_URI_append = " \
+    file://kernel_extra.cfg \
+"
 
 COMPATIBLE_MACHINE_rzg2lc-hummingboard = "(rzg2lc-hummingboard)"
 COMPATIBLE_MACHINE_rzg2l-hummingboard = "(rzg2l-hummingboard)"
