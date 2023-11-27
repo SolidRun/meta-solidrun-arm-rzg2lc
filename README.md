@@ -6,6 +6,7 @@ Currently the following boards and MPUs are supported:
 
 - Board: RZG2LC HummingBoard RZ/G2LC Kit / MPU: R9A77G044C (RZ/G2LC)
 - Board: RZG2L HummingBoard RZ/G2L Kit / MPU: R9A77G044L (RZ/G2L)
+- Board: RZV2L HummingBoard RZ/V2L Kit / MPU: R9A07G054L (RZ/V2L)
 
 ## Patches
 
@@ -53,77 +54,55 @@ This layer depends on:
 Assume that $WORK is the current working directory.
 The following instructions require a Poky installation (or equivalent).
 
-Below git configuration is required:
+**Below git configuration is required:**
 ```bash
     $ git config --global user.email "you@example.com"
     $ git config --global user.name "Your Name"
 ```
 
-Download all Yocto related public source to prepare the build environment as below.
+**Download the Yocto Project Layers (require repo app):**
 ```bash
-git clone -b dunfell https://git.yoctoproject.org/git/poky
-cd poky
-git reset --hard dunfell-23.0.21
-cd ..
-
-git clone -b dunfell https://github.com/openembedded/meta-openembedded
-cd meta-openembedded
-git reset --hard 7952135f650b4a754e2255f5aa03973a32344123
-cd ..
-
-git clone -b dunfell https://git.yoctoproject.org/git/meta-gplv2
-cd meta-gplv2
-git reset --hard 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
-cd ..
-
-git clone -b dunfell/rz https://github.com/renesas-rz/meta-renesas.git
-cd meta-renesas
-git reset --hard BSP-3.0.4
-cd ..
-
-git clone -b dunfell https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git
-cd meta-solidrun-arm-rzg2lc
-cd ..
-
-git clone -b dunfell https://github.com/meta-qt5/meta-qt5.git
-cd meta-qt5
-git reset --hard c1b0c9f546289b1592d7a895640de103723a0305
-cd ..
-
-git clone -b dunfell https://git.yoctoproject.org/git/meta-virtualization
-cd meta-virtualization
-git checkout a63a54df3170fed387f810f23cdc2f483ad587df
-cd ..
+repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git -b dunfell -m meta-solidrun-arm-rzg2lc.xml
+repo sync
 ```
 
-Download proprietary graphics drivers and/or multimedia codecs from [Renesas](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package):
-- RZ MPU Graphics Library for RZ/G2L and RZ/G2LC v1.0.5
-- RZ MPU Video Codec Library for RZ/G2L v1.1.0
+**Download proprietary graphics drivers and/or multimedia codecs from** [Renesas](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package):
+- RZ MPU Graphics Library for RZ/G2{L,LC,UL} and RZ/V2L v1.1.0
+- RZ MPU Video Codec Library for RZ/G2L and RZ/V2L v1.1.0
 (Graphic drivers are required for Wayland, Codecs optional)
 
 After downloading the proprietary packages, please decompress - then put meta-rz-features folder at $WORK.
 
-Optionally a Docker environment can be used for the build:
+**Optionally a Docker environment can be used for the build:**
 ```bash
 docker pull crops/poky:ubuntu-20.04
 docker run --rm -it -v ${PWD}:/work crops/poky:ubuntu-20.04 --workdir=/work
 ```
 
-Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:
+**Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:**
 ```bash
 TEMPLATECONF=$PWD/meta-solidrun-arm-rzg2lc/docs/template/conf/rzg2lc-solidrun source poky/oe-init-build-env build
 ```
 
-Review / Edit default configuration files:
+**Review / Edit default configuration files:**
 - `conf/bblayers.conf`
 - `conf/local.conf`
 
-Build a target using bitbake, e.g.:
+**Build a target using bitbake:**
 ```bash
-bitbake core-image-bsp
+MACHINE=<board> bitbake <target>
+# e.g
+MACHINE=rzg2lc-hummingboard bitbake core-image-bsp core-image-weston core-image-qt
 ```
+**Valid boards:**
+| Renesas MPU    | board |
+| -------- | ------- |
+| RZ/G2LC | rzg2lc-hummingboard |
+| RZ/G2L | rzg2l-hummingboard |
+| RZ/V2L | rzv2l-hummingboard |
 
-Valid targets:
+
+**Valid targets:**
 - firmware-pack: atf + u-boot
 - core-image-bsp: cli image
 - core-image-weston: graphical image
@@ -132,7 +111,7 @@ Valid targets:
 After completing the images for the target machine will be available in the output
 directory _'tmp/deploy/images/\<supported board name\>'_.
 
-Images generated:
+**Images generated:**
 * Image (generic Linux Kernel binary image file)
 * DTB for target machine
 * core-image-\<target\>-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
@@ -141,7 +120,7 @@ Images generated:
 
 ## Build configs
 
-It is possible to change some build configs as below:
+**It is possible to change some build configs as below:**
 * GPLv3: choose to not allow, or allow, GPLv3 packages
   * **Non-GPLv3 (default):** not allow GPLv3 license. All recipes that has GPLv3 license will be downgrade to older version that has alternative license (done by meta-gplv2). In this setting customer can ignore the risk of strict license GPLv3
     `INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"`
