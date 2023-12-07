@@ -1,38 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+UBOOT_URL = "git://github.com/SolidRun/u-boot.git"
+BRANCH = "v2021.10/rz-sr"
 
-SRC_URI_append = " \
-    file://0001-add-rzg2lc-solidrun-board-support.patch \
-    file://0002-add-rzg2lc-solidrun-dts-support.patch \
-    file://0003-Use-SD-card-for-u-boot-environment-variables.patch \
-    file://0004-update-bootcmd-default-value.patch \
-    file://0005-change-board-name-to-rzg2lc-solidrun.patch \
-    file://0006-update-rzg2lc-solidrun-defconfig.patch \
-    file://0007-add-solidrun-rzg2lc-Kconfig-to-.-arch-arm-mach-rmobi.patch \
-    file://0008-update-solidrun-rzg2lc-Kconfig-fix-the-sys_board-nam.patch \
-    file://0009-change-the-bootcmd-env.patch \
-    file://0010-edit-rzg2lc-solidrun-configuration.patch \
-    file://0011-remove-DISTROBOOT-flag-from-rzg2lc-solidrun_defconfi.patch \
-    file://0012-Allow-usage-of-random-MAC-addresses.patch \
-    file://0013-Add-support-for-the-tlv_eeprom-command.patch \
-    file://0014-Support-reading-MAC-address-for-ravb-driver.patch \
-    file://0015-add-carrier-eeprom-support-for-rzg2lc-solidrun.patch \
-    file://0016-add-ditroboot-support-for-rzg2lc-solidrun.patch \
-    file://0017-Fixed-reset-for-rzg2lc-solidrun-using-wdt.patch \
-    file://0018-Fixed-usb-for-rzg2lc-solidrun.patch \
-    file://0019-Set-SD0_DEV_SEL_SW-signal-in-rzg2lc-solidrun-dts.patch \
-    file://0020-Fix-USB-VBUS-signal-types.patch \
-    file://0021-add-support-to-select-eMMC-SD-during-boot-rzg2lc.patch \
-    file://0022-add-rzg2l-soldirun-board-support.patch \
-    file://0023-rzg2l_defconfig-set-the-default-fdtfile-to-rzg2l-hum.patch \
-    file://0024-rzg2l-set-memory-size-and-eth-pinctl-in-rzg2l-dts.patch \
-    file://0025-rzg2l-add-eeprom-support.patch \
-    file://0026-rzg2l-solidrun-som-usb-support.patch \
-    file://0027-rzg2l-fix-phy1-node-name-in-rzg2l-solidrun.dts.patch \
-    file://0028-rzg2l-set-eth1-as-default-interface-in-u-boot.patch \
-    file://0029-tlv-lib-support.patch \
-    file://0030-g2l-g2lc-Completed-g2l-support-tlv-carrier-detect-co.patch \
-    file://0031-ravb-support-multiple-interfaces.patch \
-    file://0032-sr-rzg2l-fix-eth0-pinmux.patch \
-    file://0033-add-RZ-V2L-SR-SOM-board-support.patch \
-    file://0034-Updated-rzg-common-remove-implicit-declarations.patch \
-"
+SRCREV = "359a0f3ec8de1447482b03c68bddb693429f7b44"
