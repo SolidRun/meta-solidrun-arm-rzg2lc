@@ -19,14 +19,12 @@ This layer depends on:
     URI: git://git.yoctoproject.org/poky
     layers: meta, meta-poky, meta-yocto-bsp
     branch: dunfell
-    revision: aa0073041806c9f417a33b0b7f747d2a86289eda
-    (tag: dunfell-23.0.21)
-    (Need to cherry-pick a commit: git cherry-pick 9e444)
+    revision: b8f1972b8482860d649641ad34ec8a17ef1dd983
 
     URI: git://git.openembedded.org/meta-openembedded
     layers: meta-oe, meta-python, meta-multimedia
     branch: dunfell
-    revision: 7952135f650b4a754e2255f5aa03973a32344123
+    revision: 9135c7ea7350d5d241f4afc3b28087122ebe2d19
 
     URI: http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
     layers: meta-gplv2
@@ -36,7 +34,8 @@ This layer depends on:
     URI: https://github.com/renesas-rz/meta-renesas.git
     layers: meta-renesas
     branch: dunfell/rz
-    revision: BSP-3.0.4
+    revision: 5377babf0f79b1a6a434503c5d083e5b047da47d
+    BSP: 3.0.5 patch 1
 
     (Optional: core-image-qt)
     URI: https://github.com/meta-qt5/meta-qt5.git
@@ -47,7 +46,7 @@ This layer depends on:
     URI: https://git.yoctoproject.org/git/meta-virtualization
     layers: meta-virtualization
     branch: dunfell
-    revision: a63a54df3170fed387f810f23cdc2f483ad587df
+    revision: 35c723774ee06b3c1831f00a2cbf25cbeae132e1
 
 ## Build Instructions
 
