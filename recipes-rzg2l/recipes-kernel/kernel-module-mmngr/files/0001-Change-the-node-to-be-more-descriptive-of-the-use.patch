@@ -1,0 +1,28 @@
+From b4eda3c44b801109b085637c18f7c2464b5d85ac Mon Sep 17 00:00:00 2001
+From: Jon Nettleton <jon@solid-run.com>
+Date: Thu, 7 Dec 2023 06:50:08 +0100
+Subject: [PATCH] Change the node to be more descriptive of the use.
+
+This reflects our device-tree changes
+
+Signed-off-by: Jon Nettleton <jon@solid-run.com>
+---
+ mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+index fdef30b..7a5ff67 100644
+--- a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
++++ b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+@@ -1306,7 +1306,7 @@ static int parse_reserved_mem_dt(struct device_node *np)
+ 
+ 	/* Parse reserved memory for multimedia */
+ 	ret = _parse_reserved_mem_dt(np, "memory-region",
+-				     "linux,multimedia",
++				     "linux,mmp",
+ 				     &mm_kernel_reserve_addr,
+ 				     &mm_kernel_reserve_size);
+ 	if (ret) {
+-- 
+2.43.0
+
