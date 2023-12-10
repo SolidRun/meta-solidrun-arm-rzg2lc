@@ -11,9 +11,11 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-renesas"
 EXTRA_IMAGEDEPENDS += "flash-writer"
 
 # build sdcard image by default
-IMAGE_FSTYPES += "wic wic.bmap"
+IMAGE_FSTYPES += "wic wic.zst wic.bmap"
 WKS_DEFAULT_FILE ?= "rzg2lc-sdcard.wks"
 WKS_FILES ?= "rzg2lc-sdcard.wks"
 
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-brcmutil linux-firmware"
 MACHINE_FEATURES += "bluetooth wifi"
+
+MACHINEOVERRIDES .= ":solidrun-rz"

@@ -10,14 +10,8 @@ BRANCH = "rz-5.10-cip36-sr"
 SRCREV = "e9f31bb50889f93cdf8f2e1706a74913e867e074"
 
 # Applying custom kernel defconfig 
-SRC_URI += "file://kernel.extra"
+SRC_URI:append = " file://kernel_extra.cfg"
 
-do_patch_append() {
-    cat ${WORKDIR}/kernel.extra >> ${S}/arch/arm64/configs/defconfig
-}
+SRC_URI:append = " ${@bb.utils.contains("DISTRO_FEATURES", "apparmor", " file://apparmor.cfg", "" ,d)}"
 
-COMPATIBLE_MACHINE_rzg2lc-hummingboard = "(rzg2lc-hummingboard)"
-COMPATIBLE_MACHINE_rzg2l-hummingboard = "(rzg2l-hummingboard)"
-COMPATIBLE_MACHINE_rzv2l-hummingboard = "(rzv2l-hummingboard)"
-
-
+COMPATIBLE_MACHINE:solidrun-rz = "(solidrun-rz)"
