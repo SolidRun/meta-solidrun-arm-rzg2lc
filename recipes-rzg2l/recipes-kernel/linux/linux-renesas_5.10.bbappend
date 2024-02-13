@@ -7,7 +7,7 @@ SRC_URI_remove_rzv2l = "file://0002-Workaround-GPU-driver-remove-power-domains-v
 KERNEL_URL = " \
     git://github.com/SolidRun/linux-stable.git"
 BRANCH = "rz-5.10-cip36-sr"
-SRCREV = "e9f31bb50889f93cdf8f2e1706a74913e867e074"
+SRCREV = "8772d496cb1c6cc15d762fb942fc510dbc4db3d4"
 
 # Applying custom kernel defconfig 
 SRC_URI:append = " file://kernel_extra.cfg"
