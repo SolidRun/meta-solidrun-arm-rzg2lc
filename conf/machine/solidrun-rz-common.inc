@@ -15,7 +15,8 @@ IMAGE_FSTYPES += "wic wic.zst wic.bmap"
 WKS_DEFAULT_FILE ?= "rzg2lc-sdcard.wks"
 WKS_FILES ?= "rzg2lc-sdcard.wks"
 
-MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-brcmutil linux-firmware"
+MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-brcmutil \
+                                        linux-firmware-bcm43439 linux-firmware-bcm43455"
 MACHINE_FEATURES += "bluetooth wifi"
 
 MACHINEOVERRIDES .= ":solidrun-rz"

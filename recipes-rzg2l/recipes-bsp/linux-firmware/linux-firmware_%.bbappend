@@ -12,4 +12,13 @@ do_install_append() {
     cp -r ${WORKDIR}/LICENSE ${D}${nonarch_base_libdir}/firmware/brcm
 }
 
-# FILES_${PN} += "${nonarch_base_libdir}/firmware"
+
+
+PACKAGES =+ "${PN}-bcm43439"
+LICENSE_${PN}-bcm43439 = "Firmware-broadcom_bcm43xx"
+RDEPENDS_${PN}-bcm43439 += "${PN}-broadcom-license"
+
+FILES_${PN}-bcm43455 += "${nonarch_base_libdir}/firmware/brcm/*43455*"
+FILES_${PN}-bcm43439 += "${nonarch_base_libdir}/firmware/brcm/*43439* \
+                        ${nonarch_base_libdir}/firmware/cypress/*43439* \
+"
