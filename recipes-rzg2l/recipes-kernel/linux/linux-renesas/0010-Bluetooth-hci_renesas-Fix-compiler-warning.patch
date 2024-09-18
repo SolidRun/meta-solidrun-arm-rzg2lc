@@ -1,0 +1,26 @@
+From b85eb6f8fa5fcfbebd28166b05450dd7823201a9 Mon Sep 17 00:00:00 2001
+From: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+Date: Mon, 15 Aug 2022 15:45:32 +0100
+Subject: [PATCH 10/18] Bluetooth: hci_renesas: Fix compiler warning
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+---
+ drivers/bluetooth/hci_renesas.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_renesas.c b/drivers/bluetooth/hci_renesas.c
+index f79928a69..af702c46d 100644
+--- a/drivers/bluetooth/hci_renesas.c
++++ b/drivers/bluetooth/hci_renesas.c
+@@ -246,7 +246,7 @@ static int renesas_load_firmware(struct hci_dev *hdev, const char *name)
+ 
+ 		switch(rdata->state) {
+ 			case STATE_FW_INIT:
+-				bt_dev_dbg(hdev, "Firmware request, expecting %d bytes", 
++				bt_dev_dbg(hdev, "Firmware request, expecting %lu bytes", 
+ 					fw->size);
+ 
+ 				set_bit(STATE_FW_ACK_PENDING, &rdata->flags);
+-- 
+2.43.0
+

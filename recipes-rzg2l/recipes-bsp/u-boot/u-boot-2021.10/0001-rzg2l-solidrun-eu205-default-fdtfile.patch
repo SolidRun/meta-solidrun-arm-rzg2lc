@@ -1,0 +1,40 @@
+From 755e3869f96f5ce37f0c49a1f512b811b7052d12 Mon Sep 17 00:00:00 2001
+From: Josua Mayer <josua@solid-run.com>
+Date: Wed, 18 Sep 2024 12:10:30 +0200
+Subject: [PATCH] rzg2l-solidrun: eu205 default fdtfile
+
+Signed-off-by: Josua Mayer <josua@solid-run.com>
+---
+ configs/rzg2l-solidrun_defconfig  | 2 +-
+ configs/rzg2lc-solidrun_defconfig | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configs/rzg2l-solidrun_defconfig b/configs/rzg2l-solidrun_defconfig
+index 1639f4d0..82111f26 100644
+--- a/configs/rzg2l-solidrun_defconfig
++++ b/configs/rzg2l-solidrun_defconfig
+@@ -18,7 +18,7 @@ CONFIG_USE_BOOTARGS=y
+ CONFIG_BOARD_LATE_INIT=y
+ CONFIG_BOOTARGS="rw rootwait root=/dev/mmcblk0p2"
+ CONFIG_SUPPORT_RAW_INITRD=y
+-CONFIG_DEFAULT_FDT_FILE="rzg2l-hummingboard-ripple.dtb"
++CONFIG_DEFAULT_FDT_FILE="rzg2l-eu205.dtb"
+ CONFIG_VERSION_VARIABLE=y
+ CONFIG_HUSH_PARSER=y
+ CONFIG_CMD_BOOTZ=y
+diff --git a/configs/rzg2lc-solidrun_defconfig b/configs/rzg2lc-solidrun_defconfig
+index 07a57c4f..7b28267e 100644
+--- a/configs/rzg2lc-solidrun_defconfig
++++ b/configs/rzg2lc-solidrun_defconfig
+@@ -18,7 +18,7 @@ CONFIG_BOOTARGS="rw rootwait root=/dev/mmcblk0p2"
+ CONFIG_USE_BOOTCOMMAND=y
+ CONFIG_BOOTCOMMAND="run distro_bootcmd"
+ CONFIG_SUPPORT_RAW_INITRD=y
+-CONFIG_DEFAULT_FDT_FILE="rzg2lc-hummingboard.dtb"
++CONFIG_DEFAULT_FDT_FILE="rzg2lc-eu205.dtb"
+ CONFIG_VERSION_VARIABLE=y
+ CONFIG_HUSH_PARSER=y
+ CONFIG_CMD_BOOTZ=y
+-- 
+2.43.0
+

@@ -1,0 +1,149 @@
+From aecfd7b00d066de92c358a4a6e8bf54c21a8459a Mon Sep 17 00:00:00 2001
+From: Josua Mayer <josua@solid-run.com>
+Date: Tue, 6 Aug 2024 10:57:44 +0300
+Subject: [PATCH 03/18] arm64: renesas: solidrun: move i2c3 to som-specific
+ dtsi
+
+i2c3 not used on all rz/_2l_ soms. Rather than deleting nodes in g2lc
+dtsi, add them in g2l and v2l som dtsi only.
+
+Signed-off-by: Josua Mayer <josua@solid-run.com>
+---
+ .../dts/renesas/rz_2l-sr-pinfunction.dtsi     |  5 -----
+ .../boot/dts/renesas/rz_2l-sr-som-common.dtsi | 15 ---------------
+ arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi | 19 +++++++++++++++++++
+ .../arm64/boot/dts/renesas/rzg2lc-sr-som.dtsi |  7 -------
+ arch/arm64/boot/dts/renesas/rzv2l-sr-som.dtsi | 19 +++++++++++++++++++
+ 5 files changed, 38 insertions(+), 27 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/rz_2l-sr-pinfunction.dtsi b/arch/arm64/boot/dts/renesas/rz_2l-sr-pinfunction.dtsi
+index d335190a6..bb5b03c90 100644
+--- a/arch/arm64/boot/dts/renesas/rz_2l-sr-pinfunction.dtsi
++++ b/arch/arm64/boot/dts/renesas/rz_2l-sr-pinfunction.dtsi
+@@ -64,11 +64,6 @@ i2c1_pins: i2c1 {
+ 		input-enable;
+ 	};
+ 
+-	i2c3_pins: i2c3 {
+-		pinmux = <RZG2L_PORT_PINMUX(18, 0, 3)>, /* SDA */
+-			 <RZG2L_PORT_PINMUX(18, 1, 3)>; /* SCL */
+-	};
+-
+ 	qspi0_pins: qspi0 {
+ 		qspi0-data {
+ 			pins = "QSPI0_IO0", "QSPI0_IO1", "QSPI0_IO2", "QSPI0_IO3";
+diff --git a/arch/arm64/boot/dts/renesas/rz_2l-sr-som-common.dtsi b/arch/arm64/boot/dts/renesas/rz_2l-sr-som-common.dtsi
+index 0ebd8c496..60801d019 100644
+--- a/arch/arm64/boot/dts/renesas/rz_2l-sr-som-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/rz_2l-sr-som-common.dtsi
+@@ -135,21 +135,6 @@ eeprom: eeprom@50 {
+ 	};
+ };
+ 
+-&i2c3 {
+-	pinctrl-0 = <&i2c3_pins>;
+-	pinctrl-names = "default";
+-	clock-frequency = <400000>;
+-
+-	status = "okay";
+-
+-	pmic: raa215300@12 {
+-		compatible = "renesas,raa215300";
+-		reg = <0x12>;
+-		rtc-enable;
+-		mpio2-32k-enable;
+-	};
+-};
+-
+ &mtu3 {
+ 	status = "okay";
+ };
+diff --git a/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi b/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
+index a53c7c015..a67a6cdbd 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
+@@ -72,7 +72,26 @@ MXL8611X_LEDX_CFG_LINK_UP_10MB_ON
+         };
+ };
+ 
++&i2c3 {
++	pinctrl-0 = <&i2c3_pins>;
++	pinctrl-names = "default";
++	clock-frequency = <400000>;
++	status = "okay";
++
++	pmic: raa215300@12 {
++		compatible = "renesas,raa215300";
++		reg = <0x12>;
++		rtc-enable;
++		mpio2-32k-enable;
++	};
++};
++
+ &pinctrl {
++	i2c3_pins: i2c-3-pins {
++		pinmux = <RZG2L_PORT_PINMUX(18, 0, 3)>, /* SDA */
++			 <RZG2L_PORT_PINMUX(18, 1, 3)>; /* SCL */
++	};
++
+ 	scif2_pins: scif-2-pins {
+ 		pinmux = <RZG2L_PORT_PINMUX(48, 0, 1)>, /* SCIF2_TXD */
+ 			 <RZG2L_PORT_PINMUX(48, 1, 1)>, /* SCIF2_RXD */
+diff --git a/arch/arm64/boot/dts/renesas/rzg2lc-sr-som.dtsi b/arch/arm64/boot/dts/renesas/rzg2lc-sr-som.dtsi
+index f68daa99c..edd452ac3 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2lc-sr-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2lc-sr-som.dtsi
+@@ -99,13 +99,6 @@ rtc: isl1208@6f {
+ 
+ };
+ 
+-&i2c3 {
+-	/delete-property/ pinctrl-0;
+-	/delete-property/ pinctrl-names;
+-	status = "disabled";
+-	/delete-node/ raa215300@12;
+-};
+-
+ &pinctrl {
+ 	/delete-node/ eth1;
+ 	/delete-node/ i2c3;
+diff --git a/arch/arm64/boot/dts/renesas/rzv2l-sr-som.dtsi b/arch/arm64/boot/dts/renesas/rzv2l-sr-som.dtsi
+index c97cf7237..2681a9664 100644
+--- a/arch/arm64/boot/dts/renesas/rzv2l-sr-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzv2l-sr-som.dtsi
+@@ -100,6 +100,20 @@ MXL8611X_LEDX_CFG_LINK_UP_10MB_ON
+         };
+ };
+ 
++&i2c3 {
++	pinctrl-0 = <&i2c3_pins>;
++	pinctrl-names = "default";
++	clock-frequency = <400000>;
++	status = "okay";
++
++	pmic: raa215300@12 {
++		compatible = "renesas,raa215300";
++		reg = <0x12>;
++		rtc-enable;
++		mpio2-32k-enable;
++	};
++};
++
+ &drpai0 {
+ 	memory-region = <&drp_reserved>;
+ 	linux-memory-region = < &{/memory@48000000} >;
+@@ -107,6 +121,11 @@ &drpai0 {
+ };
+ 
+ &pinctrl {
++	i2c3_pins: i2c-3-pins {
++		pinmux = <RZG2L_PORT_PINMUX(18, 0, 3)>, /* SDA */
++			 <RZG2L_PORT_PINMUX(18, 1, 3)>; /* SCL */
++	};
++
+ 	scif2_pins: scif-2-pins {
+ 		pinmux = <RZG2L_PORT_PINMUX(48, 0, 1)>, /* SCIF2_TXD */
+ 			 <RZG2L_PORT_PINMUX(48, 1, 1)>, /* SCIF2_RXD */
+-- 
+2.43.0
+

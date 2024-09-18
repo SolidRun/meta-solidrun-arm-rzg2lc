@@ -1,0 +1,30 @@
+From 11ec4ecbd7758fcf534715aef29479f59980bb05 Mon Sep 17 00:00:00 2001
+From: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+Date: Mon, 15 Aug 2022 15:49:32 +0100
+Subject: [PATCH 11/18] Bluetooth: hci_renesas: Fix issue with reset pin
+ direction
+
+Making the reset pin an input after resetting may not work
+if there is a pullup or a pulldown on the pin, therefore just
+keep the direction of the pin as output throughout.
+
+Signed-off-by: Fabrizio Castro <fabrizio.castro.jz@renesas.com>
+---
+ drivers/bluetooth/hci_renesas.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_renesas.c b/drivers/bluetooth/hci_renesas.c
+index af702c46d..1f3000338 100644
+--- a/drivers/bluetooth/hci_renesas.c
++++ b/drivers/bluetooth/hci_renesas.c
+@@ -176,7 +176,6 @@ static void reset_device(struct gpio_desc *gpio)
+ 	}
+ 	gpiod_set_value_cansleep(gpio, 0);
+ 	usleep_range(5000, 10000);
+-	gpiod_direction_input(gpio);
+ }
+ 
+ static void renesas_reset(struct hci_uart *hu)
+-- 
+2.43.0
+

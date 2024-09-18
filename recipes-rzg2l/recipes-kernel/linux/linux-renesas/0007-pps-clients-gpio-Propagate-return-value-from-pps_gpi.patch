@@ -1,0 +1,39 @@
+From 4b584ca1b9884d470290484795274a35ca2b5161 Mon Sep 17 00:00:00 2001
+From: Robert Hancock <robert.hancock@calian.com>
+Date: Wed, 12 Jan 2022 14:52:14 -0600
+Subject: [PATCH 07/18] pps: clients: gpio: Propagate return value from
+ pps_gpio_probe
+
+If the pps-gpio driver was probed prior to the GPIO device it uses, the
+devm_gpiod_get call returned an -EPROBE_DEFER error, but pps_gpio_probe
+replaced that error code with -EINVAL, causing the pps-gpio probe to
+fail and not be retried later. Propagate the error return value so that
+deferred probe works properly.
+
+Fixes: 161520451dfa (pps: new client driver using GPIO)
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Acked-by: Rodolfo Giometti <giometti@enneenne.com>
+Signed-off-by: Robert Hancock <robert.hancock@calian.com>
+Signed-off-by: Rodolfo Giometti <giometti@enneenne.com>
+Link: https://lore.kernel.org/r/20220112205214.2060954-1-robert.hancock@calian.com
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ drivers/pps/clients/pps-gpio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/pps/clients/pps-gpio.c b/drivers/pps/clients/pps-gpio.c
+index e0de1df2e..6e23e050b 100644
+--- a/drivers/pps/clients/pps-gpio.c
++++ b/drivers/pps/clients/pps-gpio.c
+@@ -186,7 +186,7 @@ static int pps_gpio_probe(struct platform_device *pdev)
+ 	} else {
+ 		ret = pps_gpio_setup(pdev);
+ 		if (ret)
+-			return -EINVAL;
++			return ret;
+ 	}
+ 
+ 	/* IRQ setup */
+-- 
+2.43.0
+

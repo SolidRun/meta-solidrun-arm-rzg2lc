@@ -1,0 +1,33 @@
+From 93b725ee2dc0c265ddc2e02de8ce126e93133613 Mon Sep 17 00:00:00 2001
+From: Josua Mayer <josua@solid-run.com>
+Date: Wed, 7 Aug 2024 13:27:47 +0300
+Subject: [PATCH 05/18] arm64: renesas: solidrun: g2l: add description for pmic
+ rtc on som
+
+G2L SoM has RTC inside the PMIC, available on same bus as pmic.
+Add description for this rtc.
+
+Signed-off-by: Josua Mayer <josua@solid-run.com>
+---
+ arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi b/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
+index a67a6cdbd..682f432cc 100644
+--- a/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzg2l-sr-som.dtsi
+@@ -84,6 +84,11 @@ pmic: raa215300@12 {
+ 		rtc-enable;
+ 		mpio2-32k-enable;
+ 	};
++
++	rtc: isl1208@6f {
++		compatible = "isil,isl1208";
++		reg = <0x6f>;
++	};
+ };
+ 
+ &pinctrl {
+-- 
+2.43.0
+

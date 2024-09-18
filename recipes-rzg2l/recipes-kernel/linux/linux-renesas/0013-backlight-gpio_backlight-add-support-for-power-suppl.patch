@@ -1,0 +1,94 @@
+From f834ed8d037784f988cef28c767d0cd8cbb0d6c9 Mon Sep 17 00:00:00 2001
+From: Josua Mayer <josua@solid-run.com>
+Date: Thu, 15 Aug 2024 13:23:58 +0300
+Subject: [PATCH 13/18] backlight: gpio_backlight: add support for power-supply
+ regulator
+
+Backlights might have both enable-gpio and a regulator node providing
+power.
+
+Add support for an optional "power-supply" regulator.
+The regulator is disabled after setting brightness to zero,
+and enabled before setting to one.
+
+To avoid duplicate regulator_enable code, refactor initial birghtness
+setting into calling gpio_backlight_update_status once during probe.
+
+Signed-off-by: Josua Mayer <josua@solid-run.com>
+---
+ drivers/video/backlight/gpio_backlight.c | 33 ++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/video/backlight/gpio_backlight.c b/drivers/video/backlight/gpio_backlight.c
+index 6f78d928f..bfecfe811 100644
+--- a/drivers/video/backlight/gpio_backlight.c
++++ b/drivers/video/backlight/gpio_backlight.c
+@@ -14,20 +14,33 @@
+ #include <linux/platform_data/gpio_backlight.h>
+ #include <linux/platform_device.h>
+ #include <linux/property.h>
++#include <linux/regulator/consumer.h>
+ #include <linux/slab.h>
+ 
+ struct gpio_backlight {
+ 	struct device *fbdev;
+ 	struct gpio_desc *gpiod;
++	struct regulator *power_supply;
+ };
+ 
+ static int gpio_backlight_update_status(struct backlight_device *bl)
+ {
+ 	struct gpio_backlight *gbl = bl_get_data(bl);
++	int brightness = backlight_get_brightness(bl);
++	int ret;
+ 
+-	gpiod_set_value_cansleep(gbl->gpiod, backlight_get_brightness(bl));
++	if (gbl->power_supply && brightness) {
++		ret = regulator_enable(gbl->power_supply);
++		if (ret < 0)
++			dev_err(&bl->dev, "failed to enable power supply\n");
++	}
+ 
+-	return 0;
++	gpiod_set_value_cansleep(gbl->gpiod, brightness);
++
++	if (gbl->power_supply && !brightness)
++		regulator_disable(gbl->power_supply);
++
++	return ret;
+ }
+ 
+ static int gpio_backlight_check_fb(struct backlight_device *bl,
+@@ -72,6 +85,15 @@ static int gpio_backlight_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
++	gbl->power_supply = devm_regulator_get_optional(dev, "power");
++	if (IS_ERR(gbl->power_supply)) {
++		ret = PTR_ERR(gbl->power_supply);
++		if (PTR_ERR(gbl->power_supply) != -ENODEV)
++			return dev_err_probe(dev, PTR_ERR(gbl->power_supply),
++					     "failed to acquire power regulator\n");
++		gbl->power_supply = NULL;
++	}
++
+ 	memset(&props, 0, sizeof(props));
+ 	props.type = BACKLIGHT_RAW;
+ 	props.max_brightness = 1;
+@@ -96,6 +118,13 @@ static int gpio_backlight_probe(struct platform_device *pdev)
+ 	bl->props.brightness = 1;
+ 
+ 	init_brightness = backlight_get_brightness(bl);
++	if (gbl->power_supply && init_brightness) {
++		ret = regulator_enable(gbl->power_supply);
++		if (ret < 0) {
++			dev_err(&bl->dev, "failed to enable power supply\n");
++			return ret;
++		}
++	}
+ 	ret = gpiod_direction_output(gbl->gpiod, init_brightness);
+ 	if (ret) {
+ 		dev_err(dev, "failed to set initial brightness\n");
+-- 
+2.43.0
+
