@@ -19,10 +19,14 @@
 # | 6N + 8 | bl2 (atf), fallback 6 (N = size of bl2)
 # |    128 | u-boot + bl31 (defined in ATF RZG2L_SD_FIP_BASE)
 # |    ... | reserved for u-boot
+# |   6144 | overlays fit image
+# |   7680 | u-boot env
 # |   8192 | first partition
 
 part bootparam --source rawcopy --sourceparams="file=bl2_bp_esd-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 1s
 part bl2 --source rawcopy --sourceparams="file=bl2-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 8s
 part u-boot --source rawcopy --sourceparams="file=fip-${MACHINE}.bin" --ondisk mmcblk --no-table --offset 128s
+part overlays --source rawcopy --sourceparams="file=overlays-${MACHINE}.itb" --ondisk mmcblk --no-table --offset 6144s
 part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --use-uuid --active --align 4 --offset 8192s --extra-space 16M --sourceparams="loader=u-boot"
+bootloader --configfile "${IMAGE_ROOTFS}/boot/extlinux/extlinux.conf"
 part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs --use-uuid --align 4
