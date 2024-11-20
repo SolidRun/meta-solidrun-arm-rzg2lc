@@ -16,7 +16,7 @@
   <project name="meta-openembedded" path="meta-openembedded" remote="meta-openembedded" revision="daa4619fe3fbf8c28f342c4a7163a84a330f7653" upstream="dunfell"/>
   <project name="meta-gplv2" path="meta-gplv2" remote="meta-gplv2" revision="60b251c25ba87e946a0ca4cdc8d17b1cb09292ac" upstream="dunfell"/>
   <project name="meta-renesas" path="meta-renesas" remote="meta-renesas.git" revision="b028eb836091fcfd8873c49ba46a9817b290105f" upstream="dunfell/rz"/>
-  <project name="meta-rz-panfrost" path="meta-rz-panfrost" remote="meta-renesas.git" revision="d8741f4cd53bcfa46cc447bb0ccf375cc034cb31" upstream="dunfell/rz"/>
+  <project name="meta-rz-panfrost" path="meta-rz-panfrost" remote="meta-renesas.git" revision="d8741f4cd53bcfa46cc447bb0ccf375cc034cb31" upstream="main"/>
   <project name="meta-solidrun-arm-rzg2lc" path="meta-solidrun-arm-rzg2lc" remote="meta-solidrun-arm-rzg2lc.git" revision="dunfell"/>
   <project name="meta-qt5" path="meta-qt5" remote="meta-qt5.git" revision="c1b0c9f546289b1592d7a895640de103723a0305" upstream="dunfell"/>
   <project name="meta-virtualization" path="meta-virtualization" remote="meta-virtualization" revision="521459bf588435e847d981657485bae8d6f003b5" upstream="dunfell"/>
