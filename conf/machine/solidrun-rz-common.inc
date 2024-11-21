@@ -23,6 +23,7 @@ MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-br
                                         kernel-module-leds-lp55xx-common kernel-module-leds-lp5562 \
                                         kernel-module-tpm-tis-core kernel-module-tpm-tis-spi \
                                         kernel-module-ar0521 kernel-module-imx219 \
+                                        u-boot \
 "
 
 MACHINE_FEATURES += "bluetooth wifi"
