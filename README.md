@@ -141,3 +141,60 @@ directory _'tmp/deploy/images/\<supported board name\>'_.
 * Realtime Linux: choose realtime characteristic of Linux kernel to build with. You can enable this feature by setting the value "1" to IS_RT_BSP variable in local.conf:
   `IS_RT_BSP = "1"`
  
+## More Tips
+### Adding `Panfrost` Graphics Support
+- To add Panfrost graphics support to the layer, update `conf/local.conf` with the following:
+```bash
+PACKAGECONFIG_append_pn-mesa = " egl kmsro panfrost"
+IMAGE_INSTALL_append += " mesa kmscube"
+```
+### Adding `Cog` Browser Support
+**To include the Cog browser, follow these steps:**
+1. Clone the meta-webkit repository and check out the dunfell branch:
+```bash
+git clone https://github.com/Igalia/meta-webkit.git
+cd meta-webkit
+git checkout dunfell
+```
+2. Add the layer to the BBLAYERS in conf/bblayers.conf:
+```bash
+BBLAYERS:append = " ${TOPDIR}/../meta-webkit"
+```
+3. Add Cog configuration and package to the build by appending to conf/local.conf:
+```bash
+IMAGE_INSTALL:append = " wpewebkit cog"
+PREFERRED_PROVIDER_virtual/wpebackend = "wpebackend-fdo"
+```
+### Adding `Chromium` Browser Support
+**To include the Chromium browser, follow these steps:**
+1. Clone the necessary repositories and check out the appropriate branches:
+* Clone meta-browser and check out the dunfell branch:
+```bash
+git clone https://github.com/OSSystems/meta-browser.git
+cd meta-browser
+git checkout dunfell
+```
+* Clone meta-clang and check out the dunfell-clang14 branch:
+```bash
+git clone https://github.com/kraj/meta-clang.git
+cd meta-clang
+git checkout dunfell-clang14
+```
+2. Add the layers to BBLAYERS in **conf/bblayers.conf**:
+```bash
+BBLAYERS:append = " \
+  ${TOPDIR}/../meta-clang \
+  ${TOPDIR}/../meta-browser/meta-chromium \
+"
+```
+3. Add **Chromium** to the build by appending to **conf/local.conf**:
+```bash
+IMAGE_INSTALL:append = " chromium-ozone-wayland"
+PREFERRED_VERSION_nodejs-native = "14.%"
+```
+
+### Building the Image
+* Once the configurations are complete, build the image with the following command:
+```bash
+MACHINE=<MACHINE-NAME> bitbake core-image-weston
+```
