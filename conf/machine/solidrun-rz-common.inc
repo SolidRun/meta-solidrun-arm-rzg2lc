@@ -20,10 +20,17 @@ WIC_INPUT_DEPENDS = "firmware-pack:do_deploy flash-writer:do_deploy boot-overlay
 MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-brcmutil \
                                         linux-firmware-bcm43439 linux-firmware-bcm43455 \
                                         kernel-module-hci-uart \
-                                        kernel-module-leds-lp55xx-common kernel-module-leds-lp5562 \
-                                        kernel-module-tpm-tis-core kernel-module-tpm-tis-spi \
-                                        kernel-module-ar0521 kernel-module-imx219 \
                                         u-boot \
+                                        kernel-module-leds-lp55xx-common \
+                                        kernel-module-leds-lp5562 \
+                                        kernel-module-tpm-tis-core \
+                                        kernel-module-tpm-tis-spi \
+                                        kernel-module-ar0521 \
+                                        kernel-module-imx219 \
+                                        kernel-module-panel-ronbo-rb070d30 \
+                                        kernel-module-gpio-backlight \
+                                        kernel-module-ilitek-ts-i2c \
+                                        zram \
 "
 
 MACHINE_FEATURES += "bluetooth wifi"
