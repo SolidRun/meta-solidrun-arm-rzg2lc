@@ -31,6 +31,15 @@ MACHINE_ESSENTIAL_EXTRA_RRECOMMENDS += " kernel-module-brcmfmac kernel-module-br
                                         kernel-module-gpio-backlight \
                                         kernel-module-ilitek-ts-i2c \
                                         zram \
+                                        kernel-module-rswlan \
+                                        linux-firmware-da14531 \
+                                        linux-firmware-da16200 \
+                                        kernel-module-adxl345-core \
+                                        kernel-module-adxl345-i2c \
+                                        kernel-module-gnss-serial \
+                                        kernel-module-gnss-ubx \
+                                        kernel-module-i2c-gpio \
+                                        kernel-module-pps-gpio \
 "
 
 MACHINE_FEATURES += "bluetooth wifi"

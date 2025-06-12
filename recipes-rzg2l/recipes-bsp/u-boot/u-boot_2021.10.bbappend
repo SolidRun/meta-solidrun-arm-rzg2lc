@@ -1,7 +1,7 @@
 UBOOT_URL = "git://github.com/SolidRun/u-boot.git"
 BRANCH = "v2021.10/rz-sr-cip41"
 
-SRCREV = "ba7618f65fdf48aa6d59a4b8f34d6d20c5371d23"
+SRCREV = "bf219c400dee0c09cb290b16b97b476eace847e7"
 
 UBOOT_EXTLINUX = "1"
 UBOOT_EXTLINUX_ROOT = "root=/dev/mmcblk0p2"
