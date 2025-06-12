@@ -16,6 +16,11 @@ EXTRA_FLAGS:solidrun-rzg2l-som = "BOARD=sr_rzg2l"
 FLASH_ADDRESS_BL2_BP:solidrun-rzg2l-som = "00000"
 FLASH_ADDRESS_FIP:solidrun-rzg2l-som = "1D200"
 
+COMPATIBLE_MACHINE:solidrun-rzv2l-som = "(${MACHINE})"
+PLATFORM:solidrun-rzv2l-som = "v2l"
+EXTRA_FLAGS:solidrun-rzv2l-som = "BOARD=sr_rzv2l"
+FLASH_ADDRESS_BL2_BP:solidrun-rzv2l-som = "00000"
+FLASH_ADDRESS_FIP:solidrun-rzv2l-som = "1D200"
 
 EXTRA_FLAGS:append = " FIP_ALIGN=16"
 

@@ -12,6 +12,7 @@ do_install_append() {
     cp -r ${WORKDIR}/firmware/* ${D}${nonarch_base_libdir}/firmware
     cp -r ${WORKDIR}/LICENSE ${D}${nonarch_base_libdir}/firmware/brcm
 	install -v -m644 -D ${WORKDIR}/brcmfmac43455-sdio.renesas,rzg2l-sr-som.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzg2l-sr-som.txt
+    install -v -m644 -D ${WORKDIR}/brcmfmac43455-sdio.renesas,rzg2l-sr-som.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzv2l-sr-som.txt
 }
 
 

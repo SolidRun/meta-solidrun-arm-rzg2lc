@@ -22,7 +22,7 @@ do_compile_prepend:solidrun-rzg2l-som() {
 		export SWIZZLE=T1BC
 }
 
-do_compile_prepend:solidrun-rzgv2l-som() {
+do_compile_prepend:solidrun-rzv2l-som() {
 	# Rebuild for different machine is broken
 	oe_runmake clean
 
