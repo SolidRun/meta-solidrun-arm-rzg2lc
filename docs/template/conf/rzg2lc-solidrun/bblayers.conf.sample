@@ -11,6 +11,8 @@ RZ_FEATURE_GRAPHICS = "${@os.path.isdir("${TOPDIR}/../meta-rz-features/meta-rz-g
 RZ_FEATURE_DRPAI = "${@os.path.isdir("${TOPDIR}/../meta-rz-features/meta-rz-drpai")}"
 VIRTUALIZATION_LAYER = "${@os.path.isdir("${TOPDIR}/../meta-virtualization")}"
 
+RZ_FEATURE_GRAPHICS_PANFROST = "${@os.path.isdir("${TOPDIR}/../meta-rz-panfrost") and '${RZ_FEATURE_GRAPHICS}' == 'False' }"
+
 BBLAYERS ?= " \
   ${TOPDIR}/../meta-gplv2 \
   ${TOPDIR}/../poky/meta \
@@ -30,4 +32,5 @@ BBLAYERS ?= " \
   ${@'${TOPDIR}/../meta-openembedded/meta-filesystems' if '${VIRTUALIZATION_LAYER}' == 'True' else ''} \
   ${@'${TOPDIR}/../meta-openembedded/meta-networking' if '${VIRTUALIZATION_LAYER}' == 'True' else ''} \
   ${@'${TOPDIR}/../meta-virtualization' if '${VIRTUALIZATION_LAYER}' == 'True' else ''} \
+  ${@'${TOPDIR}/../meta-rz-panfrost' if '${RZ_FEATURE_GRAPHICS_PANFROST}' == 'True' else ''} \
   "
