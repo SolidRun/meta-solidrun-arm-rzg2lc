@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 
 SRC_URI:remove = " git://github.com/renesas-rz/rzg_trusted-firmware-a.git;branch=${BRANCH};protocol=https"
 SRC_URI:append = " git://github.com/SolidRun/arm-trusted-firmware.git;branch=v2.9/rz-sr;protocol=https"
-SRCREV = "060cf0824eb1482427c630eb39bb1e2a30ddfc6b"
+SRCREV = "ee439acb1fe784706165697b1d1ba5fdc8af0bff"
 
 COMPATIBLE_MACHINE:solidrun-rzg2lc-som = "(${MACHINE})"
 PLATFORM:solidrun-rzg2lc-som = "g2l"
