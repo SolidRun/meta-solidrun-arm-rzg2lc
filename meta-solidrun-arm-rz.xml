@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <default sync-j="4"/>
+
+  <remote name="rz" fetch="https://github.com/renesas-rz"/>
+  <remote name="sr" fetch="https://github.com/SolidRun"/>
+  <remote name="yp" fetch="https://git.yoctoproject.org"/>
+  <remote name="yp-mirror" fetch="https://github.com/yoctoproject"/>
+  <remote name="oe" fetch="https://git.openembedded.org"/>
+  <remote name="oe-mirror" fetch="https://github.com/openembedded"/>
+
+  <project name="meta-arm" remote="yp" path="meta-arm" revision="refs/tags/yocto-5.0.1" upstream="scarthgap"/>
+  <project name="meta-openembedded" remote="oe-mirror" path="meta-openembedded" revision="67ad83dd7c2485dae0c90eac345007af6195b84d" upstream="scarthgap"/>
+  <project name="meta-renesas" remote="rz" path="meta-renesas" revision="refs/tags/BSP-4.0.0" upstream="BSP-4.0.0"/>
+  <project name="meta-solidrun-arm-rzg2lc" remote="sr" path="meta-solidrun-arm-rzg2lc" revision="scarthgap" upstream="scarthgap"/>
+  <project name="meta-virtualization" remote="yp" path="meta-virtualization" revision="9287a355b338361e42027ce371444111a791d64f" upstream="scarthgap"/>
+  <project name="poky" remote="yp-mirror" path="poky" revision="refs/tags/scarthgap-5.0.8" upstream="scarthgap"/>
+</manifest>

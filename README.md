@@ -1,12 +1,18 @@
-# meta-solidrun
+# Yocto BSP Layer for SolidRun Renesas SoC based Products
 
-This is a Yocto build layer(version:dunfell) that provides support for SolidRun's RZ/G2LC based platforms.
+This is the SolidRun Yocto BSP Layer for products based on Renesas SoCs.
+
+## HW Compatibility
 
 Currently the following boards and MPUs are supported:
 
-- Board: RZG2LC HummingBoard RZ/G2LC Kit / MPU: R9A77G044C (RZ/G2LC)
-- Board: RZG2L HummingBoard RZ/G2L Kit / MPU: R9A77G044L (RZ/G2L)
-- Board: RZV2L HummingBoard RZ/V2L Kit / MPU: R9A07G054L (RZ/V2L)
+- [RZ/G2LC SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-g2lc-som/)
+
+  - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
+
+## Binaries
+
+Binaries are generated automatically by our CI infrastructure to [images.solid-run.com](https://images.solid-run.com/RZ/Yocto).
 
 ## Patches
 
@@ -14,187 +20,230 @@ To contribute to this layer you should email patches to support@solid-run.com. P
 
 ## Dependencies
 
-This layer depends on:
-
-    URI: git://git.yoctoproject.org/poky
-    layers: meta, meta-poky, meta-yocto-bsp
-    branch: dunfell
-    revision: b8f1972b8482860d649641ad34ec8a17ef1dd983
-
-    URI: git://git.openembedded.org/meta-openembedded
-    layers: meta-oe, meta-python, meta-multimedia
-    branch: dunfell
-    revision: 9135c7ea7350d5d241f4afc3b28087122ebe2d19
-
-    URI: http://git.yoctoproject.org/cgit.cgi/meta-gplv2/
-    layers: meta-gplv2
-    branch: dunfell
-    revision: 60b251c25ba87e946a0ca4cdc8d17b1cb09292ac
-
-    URI: https://github.com/renesas-rz/meta-renesas.git
-    layers: meta-renesas
-    branch: dunfell/rz
-    revision: 5377babf0f79b1a6a434503c5d083e5b047da47d
-    BSP: 3.0.5 patch 1
-
-    (Optional: core-image-qt)
-    URI: https://github.com/meta-qt5/meta-qt5.git
-    layers: meta-qt5
-    revision: c1b0c9f546289b1592d7a895640de103723a0305
-
-    (Optional: Docker)
-    URI: https://git.yoctoproject.org/git/meta-virtualization
-    layers: meta-virtualization
-    branch: dunfell
-    revision: 35c723774ee06b3c1831f00a2cbf25cbeae132e1
+This layer depends on and inherits from [meta-renesas BSP-4.0.0](https://github.com/renesas-rz/meta-renesas/tree/BSP-4.0.0).
 
 ## Build Instructions
 
-Assume that $WORK is the current working directory.
-The following instructions require a Poky installation (or equivalent).
+### Host Dependencies
 
-**Below git configuration is required:**
-```bash
-    $ git config --global user.email "you@example.com"
-    $ git config --global user.name "Your Name"
-```
+Install the [repo](https://gerrit.googlesource.com/git-repo/) command, as well as the "Build Host Packages" per [Yocto Documentation](https://docs.yoctoproject.org/5.0.8/brief-yoctoprojectqs/index.html#build-host-packages).
 
-**Download the Yocto Project Layers (require repo app):**
-```bash
-repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc.git -b dunfell -m meta-solidrun-arm-rzg2lc.xml
-repo sync
-```
+### Download Yocto Recipes
 
-**Download proprietary graphics drivers and/or multimedia codecs from** [Renesas](https://www.renesas.com/us/en/products/microcontrollers-microprocessors/rz-mpus/rzg-linux-platform/rzg-marketplace/verified-linux-package/rzg-verified-linux-package):
-- RZ MPU Graphics Library for RZ/G2{L,LC,UL} and RZ/V2L v1.1.0
-- RZ MPU Video Codec Library for RZ/G2L and RZ/V2L v1.1.0
-(Graphic drivers are required for Wayland, Codecs optional)
+Start in a new empty directory with plenty of free disk space - at least 150GB. Then download the build recipes:
 
-After downloading the proprietary packages, please decompress - then put meta-rz-features folder at $WORK.
+    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
+    repo sync
 
-**Optionally a Docker environment can be used for the build:**
-```bash
-docker pull crops/poky:ubuntu-20.04
-docker run --rm -it -v ${PWD}:/work crops/poky:ubuntu-20.04 --workdir=/work
-```
+#### Optional Proprietary Graphics & Multimedia Packages
 
-**Initialize a build using the 'oe-init-build-env' script in Poky. e.g.:**
-```bash
-TEMPLATECONF=$PWD/meta-solidrun-arm-rzg2lc/docs/template/conf/rzg2lc-solidrun source poky/oe-init-build-env build
-```
+Renesas offers proprietary drivers for graphics and multimedia processing [here](https://www.renesas.com/en/software-tool/rz-mpu-verified-linux-package-61-cip#download):
 
-**Review / Edit default configuration files:**
+- RZ MPU Graphics Library V4.1.2.5 for RZ/G2L and RZ/G2LC (`RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip`)
+
+      unzip -j /opt/workspace/build_rzg2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
+      tar -xvf meta-rz-features_graphics_v4.1.2.5.tar.gz
+  
+  This shall create in the working directory new path `meta-rz-features/meta-rz-graphics`.
+
+- RZ MPU Video Codec Library V4.1.3.0 for RZ/G2L (`RTK0EF0045Z16001ZJ_v4.1.3.0_EN.zip`)
+
+      unzip -j /opt/workspace/build_rzg2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
+      tar -xvf meta-rz-features_codec_v4.1.3.0.tar.gz
+  
+  This shall create in the working directory new path `meta-rz-features/meta-rz-codecs`.
+
+These packages are optional, yocto can be built without them.
+
+#### Optional QT Framework
+
+Renesas offers QT support for RZ SoCs [here](https://www.renesas.com/en/software-tool/rz-mpu-qt-package):
+
+TBD.
+
+### Setup Build Directory
+
+Initialise a new build directory from Renesas configuration templates:
+
+    TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+
+Then add to `conf/bblayers.conf` the SolidRun meta layers:
+
+    BBLAYERS += "${TOPDIR}/../meta-solidrun-arm-rzg2lc/meta"
+    BBLAYERS += "${TOPDIR}/../meta-solidrun-arm-rzg2lc/meta-rzg2l"
+
+Finally review and modify default configuration files as needed:
+
 - `conf/bblayers.conf`
 - `conf/local.conf`
 
-**Build a target using bitbake:**
-```bash
-MACHINE=<board> bitbake <target>
-# e.g
-MACHINE=rzg2lc-hummingboard bitbake core-image-bsp core-image-weston core-image-qt
-```
-**Valid boards:**
-| Renesas MPU    | board |
-| -------- | ------- |
-| RZ/G2LC | rzg2lc-hummingboard |
-| RZ/G2L | rzg2l-hummingboard |
-| RZ/V2L | rzv2l-hummingboard |
+When returning to the build directory at a later time the command below should be used instead:
 
+    source poky/oe-init-build-env build
 
-**Valid targets:**
-- firmware-pack: atf + u-boot
-- core-image-bsp: cli image
-- core-image-weston: graphical image
-- core-image-qt: graphical image including qt
+### Enable Optional Features
 
-After completing the images for the target machine will be available in the output
-directory _'tmp/deploy/images/\<supported board name\>'_.
+#### Proprietary Graphics
 
-**Images generated:**
-* Image (generic Linux Kernel binary image file)
-* DTB for target machine
-* core-image-\<target\>-\<machine name\>.tar.bz2 (rootfs tar+bzip2)
-* core-image-\<target\>-\<machine name\>.ext4  (rootfs ext4 format)
-* core-image-\<target\>-\<machine name\>.wic  (bootable sdcard image)
+Inside build directory, run:
 
-## Build configs
+    bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
 
-**It is possible to change some build configs as below:**
-* GPLv3: choose to not allow, or allow, GPLv3 packages
-  * **Non-GPLv3 (default):** not allow GPLv3 license. All recipes that has GPLv3 license will be downgrade to older version that has alternative license (done by meta-gplv2). In this setting customer can ignore the risk of strict license GPLv3
-    `INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"`
-  * Allow-GPLv3: allow GPLv3 license. If user is fine with strict copy-left license GPLv3, can use this setting to get newer software version.
-    `#INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"`
-* CIP Core: choose the version of CIP Core to build with. CIP Core are software packages that are maintained for long term by CIP community. You can select by changing "CIP_MODE".
-  * **Buster (default):** use as many packages from CIP Core Buster as possible.
-    `CIP_MODE = "Buster"`
-  * Bullseye: use as many packages from CIP Core Bullseye.
-    `CIP_MODE = "Bullseye"`
-  * None CIP Core: not use CIP Core at all, use all default version from Yocto 3.1 Dunfell
-    `CIP_MODE = "None" or unset CIP_MODE`
+#### Proprietary Codecs
 
-* QT Demo: choose QT5 Demonstration to build with core-image-qt. QT5 Demos are some applications to demonstrate QT5 framework.
-  * Unset QT_DEMO (default): all QT5 Demos are not built with core-image-qt.
-    `#QT_DEMO = "1"`
-  * Allow QT_DEMO: all QT5 Demos are built and included in core-image-qt.
-    `QT_DEMO = "1"`
-* Realtime Linux: choose realtime characteristic of Linux kernel to build with. You can enable this feature by setting the value "1" to IS_RT_BSP variable in local.conf:
-  `IS_RT_BSP = "1"`
- 
-## More Tips
-### Adding `Panfrost` Graphics Support
-- To add Panfrost graphics support to the layer, update `conf/local.conf` with the following:
-```bash
-PACKAGECONFIG_append_pn-mesa = " egl kmsro panfrost"
-IMAGE_INSTALL_append += " mesa kmscube"
+**enable optionl proprietary packages**
+
+Inside build directory, run:
+
+    bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+
+#### Docker
+
+Inside build directory, run:
+
+    bitbake-layers add-layer ../meta-openembedded/meta-networking
+    bitbake-layers add-layer ../meta-openembedded/meta-filesystems
+    bitbake-layers add-layer ../meta-virtualization
+
+### Supported Machines
+
+- `rzg2lc-sr-som`: RZ/G2LC SoM on Hummingboard Ripple
+
+The instructions below use `rzg2lc-sr-som`, substitute as needed.
+
+### Supported Targets
+
+- `firmware-pack`: atf + u-boot
+- `core-image-minimal`
+- `core-image-full-cmdline`: cli image
+- `core-image-weston`: graphical image
+
+The instructions below use `core-image-full-cmdline`, substitute as needed.
+
+### Build
+
+With the build directory set up, any desirable yocto target may be built:
+
+    MACHINE=rzg2lc-sr-som bitbake core-image-full-cmdline
+
+After completing the images for the target machine will be available in the output directory `tmp/deploy/images/<machine>/`, e.g.:
+
 ```
-### Adding `Cog` Browser Support
-**To include the Cog browser, follow these steps:**
-1. Clone the meta-webkit repository and check out the dunfell branch:
-```bash
-git clone https://github.com/Igalia/meta-webkit.git
-cd meta-webkit
-git checkout dunfell
-```
-2. Add the layer to the BBLAYERS in conf/bblayers.conf:
-```bash
-BBLAYERS:append = " ${TOPDIR}/../meta-webkit"
-```
-3. Add Cog configuration and package to the build by appending to conf/local.conf:
-```bash
-IMAGE_INSTALL:append = " wpewebkit cog"
-PREFERRED_PROVIDER_virtual/wpebackend = "wpebackend-fdo"
-```
-### Adding `Chromium` Browser Support
-**To include the Chromium browser, follow these steps:**
-1. Clone the necessary repositories and check out the appropriate branches:
-* Clone meta-browser and check out the dunfell branch:
-```bash
-git clone https://github.com/OSSystems/meta-browser.git
-cd meta-browser
-git checkout dunfell
-```
-* Clone meta-clang and check out the dunfell-clang14 branch:
-```bash
-git clone https://github.com/kraj/meta-clang.git
-cd meta-clang
-git checkout dunfell-clang14
-```
-2. Add the layers to BBLAYERS in **conf/bblayers.conf**:
-```bash
-BBLAYERS:append = " \
-  ${TOPDIR}/../meta-clang \
-  ${TOPDIR}/../meta-browser/meta-chromium \
-"
-```
-3. Add **Chromium** to the build by appending to **conf/local.conf**:
-```bash
-IMAGE_INSTALL:append = " chromium-ozone-wayland"
-PREFERRED_VERSION_nodejs-native = "14.%"
+❯ ls -lh tmp/deploy/images/rzg2lc-sr-som
+insgesamt 1,4G
+-rw-r--r-- 2 somebody users   54K  9. Nov 18:12 bl2_bp_esd-rzg2lc-sr-som.bin
+-rw-r--r-- 2 somebody users  3,6K 10. Nov 17:00 core-image-full-cmdline-rzg2lc-sr-som.rootfs-20251110155524.wic.bmap
+-rw-r--r-- 2 somebody users  232M 10. Nov 17:00 core-image-full-cmdline-rzg2lc-sr-som.rootfs-20251110155524.wic.gz
+lrwxrwxrwx 2 somebody users    68 10. Nov 17:00 core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.bmap -> core-image-full-cmdline-rzg2lc-sr-som.rootfs-20251110155524.wic.bmap
+lrwxrwxrwx 2 somebody users    66 10. Nov 17:00 core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.gz -> core-image-full-cmdline-rzg2lc-sr-som.rootfs-20251110155524.wic.gz
+-rw-r--r-- 2 somebody users  683K  9. Nov 18:12 fip-rzg2lc-sr-som.bin
+-rw-r--r-- 2 somebody users  276K  9. Nov 17:42 Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_1GB_1PCS.mot
+-rw-r--r-- 2 somebody users  276K  9. Nov 17:42 Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_2GB_1PCS.mot
+-rw-r--r-- 2 somebody users  276K  9. Nov 17:42 Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_512MB_1PCS.mot
+...
 ```
 
-### Building the Image
-* Once the configurations are complete, build the image with the following command:
-```bash
-MACHINE=<MACHINE-NAME> bitbake core-image-weston
+### Build configs
+
+It is possible to change some build configs as below:
+
+- GPLv3: choose to disallow GPLv3 packages:
+
+  All recipes that has GPLv3 license will be downgrade to older version that has alternative license (done by meta-gplv2).
+  In this setting customer can ignore the risk of strict license GPLv3:
+  
+      INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
+
+## Known Issues
+
+## Many `-native` recipes fail when host gcc is v15 or later
+
+On systems with gcc v15 or later, a range of `*-native` tasks fail:
+
+- unzip-native
+- m4-native
+- pkgconfig-native
+- gmp-native
+- libgpg-error-native
+- ncurses-native
+- gdbm-native
+- libtirpc-native
+- cmake-native
+- llvm-native
+- parted-native
+- bash-native
+- git-native
+- e2fsprogs-native
+- elfutils-native
+- rust-llvm-native
+- cairo-native
+- ckermit-native
+- flex-native
+
+This requires a substantial number of patches applied to poky:
+
+- https://github.com/yoctoproject/poky/commit/b63fff4544c7e2033d689c686de9ab7aeef6a253
+- https://github.com/yoctoproject/poky/commit/9bea9b739490da27646baf21777c76e15b801422
+- https://github.com/yoctoproject/poky/commit/7de652686657eea29974a24cf3a1a698a08edd08
+- https://github.com/yoctoproject/poky/commit/f06f09415b53db0b5c209da4a40f1dfc0541a157
+- https://github.com/yoctoproject/poky/commit/0fdc4f72f599c79a37baa15e909c6379556d87a2
+- https://github.com/yoctoproject/poky/commit/8ade657e16a69c3bdff731d92b644184e7519010
+- https://github.com/yoctoproject/poky/commit/2a0bd475e827952b6d97348693ed8a1faac957ec
+- https://github.com/yoctoproject/poky/commit/e2e54e0354ed375a18bcc0758b7edb395b9a68bd
+- https://github.com/yoctoproject/poky/commit/6b639e19757b7321347eeb811c470a00b0735851
+- https://github.com/yoctoproject/poky/commit/c345127b52d21944543882f86b8ddd43e188e87c
+- https://github.com/yoctoproject/poky/commit/f19d608f5822eb7d76a15315b801651445ce2926
+- https://github.com/yoctoproject/poky/commit/f1647fba72042f1c131716f367eea03faddf6ba3
+- https://github.com/yoctoproject/poky/commit/fb9746b787d6914272fee8f43f39017b4fba532d
+- https://github.com/yoctoproject/poky/commit/93c7e114572fa7b607fe1165ce70c7f2fdf26265
+- https://github.com/yoctoproject/poky/commit/38b5ba89e600455018f902edaa4ecfec6c4d68c7
+- https://github.com/yoctoproject/poky/commit/19dd05ccc99e250364138c116324af942249a8a8
+- https://github.com/yoctoproject/poky/commit/38a5779745ec3a75cb573c802139b7fcb853f21d
+- https://github.com/yoctoproject/poky/commit/cb17b874de640dfe135401c324c9e74c103e8ce5
+- https://github.com/yoctoproject/poky/commit/765333686d4c1921d8d4727ce3e439e294236492
+- https://github.com/yoctoproject/poky/commit/dcfcbb21c229110aa667ded8df7539f0c6bb6877
+- https://github.com/yoctoproject/poky/commit/2a7d38f814b5f4f043e4baf7d3a2d643b85f689f
+- https://github.com/openembedded/meta-openembedded/commit/8e135096102ca2ce0ee64f42b88268b2ef5c10aa
+- https://github.com/openembedded/meta-openembedded/commit/b57123a0900e3aa2682e58c582387ed9d09958cf
+
+Apply patches individually:
+
+```
+pushd poky
+git cherry-pick b63fff4544c7e2033d689c686de9ab7aeef6a253
+git cherry-pick 9bea9b739490da27646baf21777c76e15b801422
+git cherry-pick 7de652686657eea29974a24cf3a1a698a08edd08
+git cherry-pick f06f09415b53db0b5c209da4a40f1dfc0541a157
+git cherry-pick 0fdc4f72f599c79a37baa15e909c6379556d87a2
+git cherry-pick 52ac1f33095106e4ee8df5b1e4fb3ce0a95984fa
+git cherry-pick 8ade657e16a69c3bdff731d92b644184e7519010
+git cherry-pick 2a0bd475e827952b6d97348693ed8a1faac957ec
+git cherry-pick e2e54e0354ed375a18bcc0758b7edb395b9a68bd
+git cherry-pick 6b639e19757b7321347eeb811c470a00b0735851
+git cherry-pick c345127b52d21944543882f86b8ddd43e188e87c
+git cherry-pick f19d608f5822eb7d76a15315b801651445ce2926
+git cherry-pick f1647fba72042f1c131716f367eea03faddf6ba3
+git cherry-pick fb9746b787d6914272fee8f43f39017b4fba532d
+git cherry-pick 93c7e114572fa7b607fe1165ce70c7f2fdf26265
+git cherry-pick 38b5ba89e600455018f902edaa4ecfec6c4d68c7
+git cherry-pick 19dd05ccc99e250364138c116324af942249a8a8
+git cherry-pick 38a5779745ec3a75cb573c802139b7fcb853f21d
+git cherry-pick cb17b874de640dfe135401c324c9e74c103e8ce5
+git cherry-pick 765333686d4c1921d8d4727ce3e439e294236492
+git cherry-pick dcfcbb21c229110aa667ded8df7539f0c6bb6877
+git cherry-pick 2a7d38f814b5f4f043e4baf7d3a2d643b85f689f
+popd
+
+pushd meta-openembedded
+git cherry-pick 8e135096102ca2ce0ee64f42b88268b2ef5c10aa
+git cherry-pick b57123a0900e3aa2682e58c582387ed9d09958cf
+popd
+```
+
+Alternatively upgrade poky from pinned version 5.0.8 to 5.0.13
+
+```
+pushd poky
+git reset --hard yocto-5.0.13
+popd
 ```
