@@ -1,0 +1,224 @@
+name: build
+
+on:
+  push:
+    branches: ["scarthgap"]
+  pull_request:
+    branches: ["scarthgap"]
+  schedule:
+    - cron: "0 0 * * 5"
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  prepare_container:
+    runs-on: self-hosted
+    timeout-minutes: 30
+    outputs:
+      uid: ${{ steps.uid_step.outputs.userid }}
+      gid: ${{ steps.uid_step.outputs.groupid }}
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      - name: Get user id/group
+        id: uid_step
+        run: |
+          echo "userid=$(id -u)" >> "$GITHUB_OUTPUT"
+          echo "groupid=$(id -g)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          buildkitd-config: /etc/docker/cibuilder.toml
+
+      - name: Login to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ciserver.ci:5000
+          username: ${{ secrets.CI_CACHE_REGISTRY_LOGIN }}
+          password: ${{ secrets.CI_CACHE_REGISTRY_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ciserver.ci:5000/${{ github.repository_id }}/scarthgap:latest
+          cache-from: type=registry,ref=ciserver.ci:5000/${{ github.repository_id }}:cache-scarthgap
+          cache-to: type=registry,ref=ciserver.ci:5000/${{ github.repository_id }}:cache-scarthgap,mode=max
+          file: meta/conf/docker/Dockerfile
+          build-args: |
+            USER_ID=${{ steps.uid_step.outputs.userid }}
+            GROUP_ID=${{ steps.uid_step.outputs.groupid }}
+
+  info:
+    runs-on: self-hosted
+    timeout-minutes: 10
+    outputs:
+      build_tag: ${{ steps.tag_step.outputs.build_tag }}
+    steps:
+      - name: Checkout pull-request version of meta-solidrun-arm-rzg2lc
+        uses: actions/checkout@v4
+        with:
+          path: meta-solidrun-arm-rzg2lc
+      - name: Get build tag
+        shell: bash {0}
+        id: tag_step
+        run: |
+          build_tag=$(date +%Y-%m-%d)_$(cd meta-solidrun-arm-rzg2lc; git rev-parse --short HEAD)
+          echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
+
+  build_rzg2lc:
+    needs:
+      - prepare_container
+      - info
+    runs-on: self-hosted
+    timeout-minutes: 300
+    container:
+        image: ciserver.ci:5000/${{ github.repository_id }}/scarthgap:latest
+        credentials:
+            username: ${{ secrets.CI_CACHE_REGISTRY_LOGIN }}
+            password: ${{ secrets.CI_CACHE_REGISTRY_PASSWORD }}
+        options: --user developer
+    steps:
+      - name: Checkout dependency layers
+        shell: bash {0}
+        run: |
+          repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
+          repo sync
+
+      - name: Checkout pull-request version of meta-solidrun-arm-rzg2lc
+        uses: actions/checkout@v4
+        with:
+          path: meta-solidrun-arm-rzg2lc
+
+      - name: Create cache dir
+        run: mkdir -p buildcache
+
+      - name: Fetch cache from server
+        uses: tespkg/actions-cache/restore@v1
+        with:
+          endpoint: ciserver.ci
+          port: 9000
+          insecure: true
+          accessKey: ${{ secrets.CI_CACHE_MINIO_ACCESS }}
+          secretKey: ${{ secrets.CI_CACHE_MINIO_SECRET }}
+          bucket: cicache
+          use-fallback: false
+          key: ${{ github.repository }}/scarthgap
+          path: |
+            buildcache
+
+      - name: Configure
+        shell: bash {0}
+        run: |
+            TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+            bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
+            bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzg2l
+            #bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
+            #bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+            bitbake-layers add-layer ../meta-openembedded/meta-networking
+            bitbake-layers add-layer ../meta-openembedded/meta-filesystems
+            bitbake-layers add-layer ../meta-virtualization
+            echo "require conf/includes/ci.conf" >> conf/local.conf
+
+      - name: Download Sources (ignore errors)
+        shell: bash {0}
+        run: |
+            source poky/oe-init-build-env build
+            export CACHE_DIR="$GITHUB_WORKSPACE/buildcache"
+            export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CACHE_DIR"
+            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline --runall=fetch
+        continue-on-error: true
+
+      - name: Build (ignore errors)
+        if: ${{ !cancelled() }}
+        id: build_step
+        shell: bash {0}
+        run: |
+            source poky/oe-init-build-env build
+            export CACHE_DIR="$GITHUB_WORKSPACE/buildcache"
+            export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CACHE_DIR"
+            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline
+        continue-on-error: true
+
+      - name: Update cache on the server (build may have failed)
+        if: ${{ !cancelled() }}
+        uses: tespkg/actions-cache/save@v1
+        with:
+          endpoint: ciserver.ci
+          port: 9000
+          insecure: true
+          accessKey: ${{ secrets.CI_CACHE_MINIO_ACCESS }}
+          secretKey: ${{ secrets.CI_CACHE_MINIO_SECRET }}
+          bucket: cicache
+          use-fallback: false
+          key: ${{ github.repository }}/scarthgap
+          path: |
+            buildcache
+
+      - name: Fail Late
+        if: ${{ steps.build_step.outcome == 'failure'}}
+        shell: bash {0}
+        run: exit 1
+
+      - name: Select artifacts for publishing
+        shell: bash -e {0}
+        run: |
+            MACHINE=rzg2lc-sr-som
+            ls -lh build/tmp/deploy/images/$MACHINE/
+            mkdir -p deploy/$MACHINE
+            cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.bmap deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.gz deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.manifest deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/rzg2lc-hummingboard-ripple.dtb deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/Image.gz deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/modules-rzg2lc-sr-som.tgz deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/bl2_bp_esd-rzg2lc-sr-som.bin deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/fip-rzg2lc-sr-som.bin deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_512MB_1PCS.mot deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_1GB_1PCS.mot deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_2GB_1PCS.mot deploy/$MACHINE/
+            ls -lh deploy/$MACHINE/
+
+      - name: Deploy to the local minio storage
+        uses: yakubique/minio-upload@v1.1.3
+        with:
+          endpoint: http://ciserver.ci:9000
+          insecure: true
+          access_key: ${{ secrets.CI_CACHE_MINIO_ACCESS }}
+          secret_key: ${{ secrets.CI_CACHE_MINIO_SECRET }}
+          bucket: cipublish
+          source: ./deploy
+          target: "/${{ github.repository_id }}/${{ needs.info.outputs.build_tag }}/scarthgap"
+          recursive: true
+
+  publish:
+    if: github.ref == 'refs/heads/scarthgap' && github.event_name != 'pull_request'
+    needs:
+      - info
+      - build_rzg2lc
+    runs-on: self-hosted
+    steps:
+      - name: Download artifacts from the local minio storage
+        uses: yakubique/minio-download@v1.1.1
+        with:
+          endpoint: http://ciserver.ci:9000
+          insecure: true
+          access_key: ${{ secrets.CI_CACHE_MINIO_ACCESS }}
+          secret_key: ${{ secrets.CI_CACHE_MINIO_SECRET }}
+          bucket: cipublish
+          source: "/${{ github.repository_id }}/${{ needs.info.outputs.build_tag }}/scarthgap"
+          target: "."
+          recursive: true
+
+      - name: Upload to S3
+        uses: shallwefootball/upload-s3-action@v1.3.3
+        with:
+          aws_key_id: ${{ secrets.IMAGES_S3_ACCESS }}
+          aws_secret_access_key: ${{ secrets.IMAGES_S3_SECRET }}
+          aws_bucket: ${{ secrets.IMAGES_S3_BUCKET }}
+          endpoint: ${{ secrets.IMAGES_S3_HOST }}
+          source_dir: deploy
+          destination_dir: RZ/Yocto/vlp4/${{ needs.info.outputs.build_tag }}
