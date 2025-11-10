@@ -12,7 +12,7 @@ Currently the following boards and MPUs are supported:
 
 ## Binaries
 
-Binaries are generated automatically by our CI infrastructure to [images.solid-run.com](https://images.solid-run.com/RZ/Yocto).
+Binaries are generated automatically by our CI infrastructure to [images.solid-run.com](https://images.solid-run.com/RZ/Yocto/vlp4/).
 
 ## Patches
 
