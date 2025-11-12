@@ -93,6 +93,24 @@ jobs:
         with:
           path: meta-solidrun-arm-rzg2lc
 
+      - name: Fetch Proprietary Layers
+        shell: bash -e {0}
+        env:
+          ACCESS_KEY: ${{ secrets.IMAGES_S3_ACCESS }}
+          SECRET_KEY: ${{ secrets.IMAGES_S3_SECRET }}
+          HOST: ${{ secrets.IMAGES_S3_HOST }}
+          BUCKET: ${{ secrets.PROTECTED_S3_BUCKET }}
+        run: |
+          s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip
+          unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
+          tar -xf meta-rz-features_graphics_v4.1.2.5.tar.gz
+          #s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip
+          #unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
+          #tar -xf meta-rz-features_codec_v4.1.3.0.tar.gz
+          s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0224Z00000ZJ_v4.0.0.0.zip
+          unzip -j RTK0EF0224Z00000ZJ_v4.0.0.0.zip RTK0EF0224Z00000ZJ_v4.0.0.0/rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
+          tar -xf rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
+
       - name: Create cache dir
         run: mkdir -p buildcache
 
@@ -116,8 +134,11 @@ jobs:
             TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzg2l
-            #bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
+            bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
             #bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+            bitbake-layers add-layer ../meta-qt6
+            bitbake-layers add-layer ../meta-rz-qt6
+            sed -i 's;^\(TUNE_FEATURES:remove = "crypto"\)$;# \1;g' ../meta-rz-qt6/conf/layer.conf
             bitbake-layers add-layer ../meta-openembedded/meta-networking
             bitbake-layers add-layer ../meta-openembedded/meta-filesystems
             bitbake-layers add-layer ../meta-virtualization
@@ -129,7 +150,7 @@ jobs:
             source poky/oe-init-build-env build
             export CACHE_DIR="$GITHUB_WORKSPACE/buildcache"
             export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CACHE_DIR"
-            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline --runall=fetch
+            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline solidrun-demo-image --runall=fetch
         continue-on-error: true
 
       - name: Build (ignore errors)
@@ -140,7 +161,7 @@ jobs:
             source poky/oe-init-build-env build
             export CACHE_DIR="$GITHUB_WORKSPACE/buildcache"
             export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CACHE_DIR"
-            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline
+            MACHINE=rzg2lc-sr-som bitbake -k core-image-full-cmdline solidrun-demo-image
         continue-on-error: true
 
       - name: Update cache on the server (build may have failed)
@@ -172,6 +193,9 @@ jobs:
             cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.bmap deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.gz deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/core-image-full-cmdline-rzg2lc-sr-som.rootfs.manifest deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.bmap deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.gz deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.manifest deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/rzg2lc-hummingboard-ripple.dtb deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/Image.gz deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/modules-rzg2lc-sr-som.tgz deploy/$MACHINE/

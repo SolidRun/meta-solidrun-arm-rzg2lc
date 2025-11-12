@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y apt-transport-https \
     bash icecc zstd
 
 # Install extra non-yocto build tools
-RUN apt-get update && apt-get install -y repo
+RUN apt-get update && apt-get install -y repo s3cmd
 
 RUN locale-gen en_US.UTF-8
 

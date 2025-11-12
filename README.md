@@ -28,6 +28,14 @@ This layer depends on and inherits from [meta-renesas BSP-4.0.0](https://github.
 
 Install the [repo](https://gerrit.googlesource.com/git-repo/) command, as well as the "Build Host Packages" per [Yocto Documentation](https://docs.yoctoproject.org/5.0.8/brief-yoctoprojectqs/index.html#build-host-packages).
 
+Alternatively it is possible to use docker for a consistent build environment meeting all requirements:
+
+    docker run --rm -it -v $PWD:/home/pokyuser crops/poky:ubuntu-22.04
+
+For Podman:
+
+    docker run --userns=keep-id:uid=1000,gid=1000 --rm -it -v $PWD:/home/pokyuser crops/poky:ubuntu-22.04
+
 ### Download Yocto Recipes
 
 Start in a new empty directory with plenty of free disk space - at least 150GB. Then download the build recipes:
@@ -41,14 +49,14 @@ Renesas offers proprietary drivers for graphics and multimedia processing [here]
 
 - RZ MPU Graphics Library V4.1.2.5 for RZ/G2L and RZ/G2LC (`RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip`)
 
-      unzip -j /opt/workspace/build_rzg2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
+      unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
       tar -xvf meta-rz-features_graphics_v4.1.2.5.tar.gz
   
   This shall create in the working directory new path `meta-rz-features/meta-rz-graphics`.
 
 - RZ MPU Video Codec Library V4.1.3.0 for RZ/G2L (`RTK0EF0045Z16001ZJ_v4.1.3.0_EN.zip`)
 
-      unzip -j /opt/workspace/build_rzg2lc/RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
+      unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
       tar -xvf meta-rz-features_codec_v4.1.3.0.tar.gz
   
   This shall create in the working directory new path `meta-rz-features/meta-rz-codecs`.
@@ -59,7 +67,14 @@ These packages are optional, yocto can be built without them.
 
 Renesas offers QT support for RZ SoCs [here](https://www.renesas.com/en/software-tool/rz-mpu-qt-package):
 
-TBD.
+Qt6 packages V4.0.0.0 for RZ/G Verified Linux Package V4.0.0 (`RTK0EF0224Z00000ZJ_v4.0.0.0.zip`)
+
+    unzip -j RTK0EF0224Z00000ZJ_v4.0.0.0.zip RTK0EF0224Z00000ZJ_v4.0.0.0/rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
+    tar -xvf rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
+
+This shall create in the working directory new paths `meta-qt6` and `meta-rz-qt6`.
+
+Note that RZ QT depoends on Proprietary Graphics Layer (RZ/G2L & RZ/G2lc) and Pripretary Codecs (RZ/G2L only).
 
 ### Setup Build Directory
 
@@ -91,11 +106,17 @@ Inside build directory, run:
 
 #### Proprietary Codecs
 
-**enable optionl proprietary packages**
-
 Inside build directory, run:
 
     bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+
+#### QT
+
+First enable proprietary graphics, and for G2L only, codecs. Then:
+Inside build directory, run:
+
+    bitbake-layers add-layer ../meta-qt6
+    bitbake-layers add-layer ../meta-rz-qt6
 
 #### Docker
 
@@ -116,7 +137,9 @@ The instructions below use `rzg2lc-sr-som`, substitute as needed.
 - `firmware-pack`: atf + u-boot
 - `core-image-minimal`
 - `core-image-full-cmdline`: cli image
+- `core-image-qt`: graphical image with QT
 - `core-image-weston`: graphical image
+- `solidrun-demo-image`: graphical image with QT examples and development tools
 
 The instructions below use `core-image-full-cmdline`, substitute as needed.
 
@@ -155,6 +178,23 @@ It is possible to change some build configs as below:
       INCOMPATIBLE_LICENSE = "GPLv3 GPLv3+"
 
 ## Known Issues
+
+## QT layer disables crypto optimisations:
+
+After enabling `meta-rz-qt6` layer, yocto no longer builds with arm crypto instructions:
+
+```
+# expected:
+TUNE_FEATURES        = "aarch64 crypto cortexa55"
+# actual:
+TUNE_FEATURES        = "aarch64  cortexa55"
+```
+
+To re-enable them, **remove or comment** below lines from `meta-rz-qt6/conf/layer.conf`
+
+    # Remove crypto feature because some boards lack cryptographic hardware support
+    TUNE_FEATURES:remove = "crypto"
+
 
 ## Many `-native` recipes fail when host gcc is v15 or later
 
