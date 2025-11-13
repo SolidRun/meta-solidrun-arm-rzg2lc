@@ -5,14 +5,19 @@ require include/rz-modules-common.inc
 SUMMARY = "SolidRun RZ/G2LC Demo Image"
 
 IMAGE_INSTALL:append = " \
+	packagegroup-core-buildessential \
 	${@bb.utils.contains('BBFILE_COLLECTIONS', 'qt6-layer', 'packagegroup-qt6-modules', '', d)} \
 	${@bb.utils.contains('BBFILE_COLLECTIONS', 'qt6-layer', 'packagegroup-qt6-examples', '', d)} \
+	ca-certificates \
+	cmake \
 	curl \
 	git \
 	htop \
 	kernel-modules \
 	modemmanager \
+	nano \
 	tzdata \
+	wget \
 "
 
 inherit ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qt6-layer', 'populate_sdk_qt6', '', d)}
