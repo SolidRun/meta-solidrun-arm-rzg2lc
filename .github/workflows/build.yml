@@ -56,18 +56,21 @@ jobs:
     runs-on: self-hosted
     timeout-minutes: 10
     outputs:
-      build_tag: ${{ steps.tag_step.outputs.build_tag }}
+      build_date: ${{ steps.tag_step.outputs.build_date }}
+      build_rev: ${{ steps.tag_step.outputs.build_rev }}
+      build_ref: ${{ steps.tag_step.outputs.build_ref }}
+      build_tag: ${{ steps.tag_step.outputs.build_date }}_${{ steps.tag_step.outputs.build_rev }}
     steps:
-      - name: Checkout pull-request version of meta-solidrun-arm-rzg2lc
-        uses: actions/checkout@v4
-        with:
-          path: meta-solidrun-arm-rzg2lc
-      - name: Get build tag
+      - name: Generate build tags
         shell: bash {0}
         id: tag_step
         run: |
-          build_tag=$(date +%Y-%m-%d)_$(cd meta-solidrun-arm-rzg2lc; git rev-parse --short HEAD)
-          echo "build_tag=$build_tag" >> "$GITHUB_OUTPUT"
+          build_date="$(date +%Y-%m-%d)"
+          build_rev="$(echo ${GITHUB_SHA} | head -zc 7)"
+          build_ref="${GITHUB_REF}"
+          echo "build_date=$build_date" >> "$GITHUB_OUTPUT"
+          echo "build_rev=$build_rev" >> "$GITHUB_OUTPUT"
+          echo "build_ref=$build_ref" >> "$GITHUB_OUTPUT"
 
   build_rzg2lc:
     needs:
@@ -81,6 +84,8 @@ jobs:
             username: ${{ secrets.CI_CACHE_REGISTRY_LOGIN }}
             password: ${{ secrets.CI_CACHE_REGISTRY_PASSWORD }}
         options: --user developer
+    outputs:
+      local_artifacts_path: ${{ steps.store_path.outputs.local_artifacts_path }}
     steps:
       - name: Checkout dependency layers
         shell: bash {0}
@@ -208,6 +213,11 @@ jobs:
             cp -L build/tmp/deploy/images/$MACHINE/Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_2GB_1PCS.mot deploy/$MACHINE/
             ls -lh deploy/$MACHINE/
 
+      - name: Store local storage path for this build
+        id: store_path
+        run: |
+          echo "local_artifacts_path=${{ github.repository_id }}/${{ needs.info.outputs.build_tag }}" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to the local minio storage
         uses: yakubique/minio-upload@v1.1.3
         with:
@@ -217,7 +227,7 @@ jobs:
           secret_key: ${{ secrets.CI_CACHE_MINIO_SECRET }}
           bucket: cipublish
           source: ./deploy/
-          target: "/${{ github.repository_id }}/${{ needs.info.outputs.build_tag }}"
+          target: "/${{ steps.store_path.outputs.local_artifacts_path }}/"
           recursive: true
 
   publish:
@@ -235,7 +245,7 @@ jobs:
           access_key: ${{ secrets.CI_CACHE_MINIO_ACCESS }}
           secret_key: ${{ secrets.CI_CACHE_MINIO_SECRET }}
           bucket: cipublish
-          source: "/${{ github.repository_id }}/${{ needs.info.outputs.build_tag }}"
+          source: "/${{ needs.build_rzg2lc.outputs.local_artifacts_path }}/"
           target: "."
           recursive: true
 
@@ -246,5 +256,54 @@ jobs:
           aws_secret_access_key: ${{ secrets.IMAGES_S3_SECRET }}
           aws_bucket: ${{ secrets.IMAGES_S3_BUCKET }}
           endpoint: ${{ secrets.IMAGES_S3_HOST }}
-          source_dir: ${{ needs.info.outputs.build_tag }}
+          source_dir: .
           destination_dir: RZ/Yocto/vlp4/${{ needs.info.outputs.build_tag }}
+
+  test_images:
+    needs:
+      - info
+      - build_rzg2lc
+    runs-on: self-hosted
+    timeout-minutes: 90
+
+    steps:
+      - name: Generate Temporary Image Download URLs
+        id: dl_url
+        shell: bash {0}
+        run: |
+          echo "rzg2lc_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.build_rzg2lc.outputs.local_artifacts_path }}/rzg2lc-sr-som/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
+          echo "rzg2lc_solidrun_demo_image_url=http://ciserver.ci:8000/cipublish/${{ needs.build_rzg2lc.outputs.local_artifacts_path }}/rzg2lc-sr-som/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout LAVA action
+        uses: actions/checkout@v4
+        with:
+          repository: SolidRun/lava-test-definitions
+          path: .lava-action
+          ssh-key: ${{ secrets.LAVA_ACTION_SECRET }}
+
+      - name: Test Images on LAVA
+        id: submit
+        uses: ./.lava-action/.github/actions/lava-submit
+        with:
+          server: 192.168.15.184
+          port: 8001
+          timeout: 36000
+          jobs: |
+            [
+              {
+                "device_type": "rz",
+                "tags": ["rz_g2lc"],
+                "image_url": "${{ steps.dl_url.outputs.rzg2lc_core_image_full_cmdline_url }}",
+                "description": "RZ/G2LC Yocto - SolidRun Demo - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              },
+              {
+                "device_type": "rz",
+                "tags": ["rz_g2lc"],
+                "image_url": "${{ steps.dl_url.outputs.rzg2lc_solidrun_demo_image_url }}",
+                "description": "RZ/G2LC Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              }
+            ]
