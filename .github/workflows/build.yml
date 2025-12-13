@@ -196,7 +196,9 @@ jobs:
             cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.bmap deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.gz deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/solidrun-demo-image-rzg2lc-sr-som.rootfs.manifest deploy/$MACHINE/
-            cp -L build/tmp/deploy/images/$MACHINE/rzg2lc-hummingboard-ripple.dtb deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/r9a07g044c2-hummingboard-iiot.dtb deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/r9a07g044c2-hummingboard-ripple.dtb deploy/$MACHINE/
+            cp -L build/tmp/deploy/images/$MACHINE/rzg2lc-hummingboard-pulse-leds.dtbo deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/Image.gz deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/modules-rzg2lc-sr-som.tgz deploy/$MACHINE/
             cp -L build/tmp/deploy/images/$MACHINE/bl2_bp_esd-rzg2lc-sr-som.bin deploy/$MACHINE/
