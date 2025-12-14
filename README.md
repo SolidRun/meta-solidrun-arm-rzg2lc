@@ -8,6 +8,21 @@ Currently the following boards and MPUs are supported:
 
 - [RZ/G2LC SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-g2lc-som/)
 
+  - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-iot-sbc/)
+  - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
+
+- [RZ/G2L SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-g2l-som/)
+
+  - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-iot-sbc/)
+  - [HummingBoard Pro](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-sbc/)
+  - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
+
+- [RZ/V2L SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-v2l-som/)
+
+  **Partial support only, in particular NPU not yet supported in this release.**
+
+  - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-iot-sbc/)
+  - [HummingBoard Pro](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-sbc/)
   - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
 
 ## Binaries
@@ -34,7 +49,7 @@ Alternatively it is possible to use docker for a consistent build environment me
 
 For Podman:
 
-    docker run --userns=keep-id:uid=1000,gid=1000 --rm -it -v $PWD:/home/pokyuser crops/poky:ubuntu-22.04
+    docker run --userns=keep-id:uid=1000,gid=1000 --pids-limit=16384 --rm -it -v $PWD:/home/pokyuser crops/poky:ubuntu-22.04
 
 ### Download Yocto Recipes
 
@@ -47,14 +62,14 @@ Start in a new empty directory with plenty of free disk space - at least 150GB. 
 
 Renesas offers proprietary drivers for graphics and multimedia processing [here](https://www.renesas.com/en/software-tool/rz-mpu-verified-linux-package-61-cip#download):
 
-- RZ MPU Graphics Library V4.1.2.5 for RZ/G2L and RZ/G2LC (`RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip`)
+- RZ MPU Graphics Library V4.1.2.5 for RZ/G2LC & RZ/G2L & RZ/V2L (`RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip`)
 
       unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
       tar -xvf meta-rz-features_graphics_v4.1.2.5.tar.gz
   
   This shall create in the working directory new path `meta-rz-features/meta-rz-graphics`.
 
-- RZ MPU Video Codec Library V4.1.3.0 for RZ/G2L (`RTK0EF0045Z16001ZJ_v4.1.3.0_EN.zip`)
+- RZ MPU Video Codec Library V4.1.3.0 for RZ/G2L & RZ/V2L (`RTK0EF0045Z16001ZJ_v4.1.3.0_EN.zip`)
 
       unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
       tar -xvf meta-rz-features_codec_v4.1.3.0.tar.gz
@@ -74,7 +89,7 @@ Qt6 packages V4.0.0.0 for RZ/G Verified Linux Package V4.0.0 (`RTK0EF0224Z00000Z
 
 This shall create in the working directory new paths `meta-qt6` and `meta-rz-qt6`.
 
-Note that RZ QT depoends on Proprietary Graphics Layer (RZ/G2L & RZ/G2lc) and Pripretary Codecs (RZ/G2L only).
+Note that RZ QT depoends on Proprietary Graphics Layer (RZ/G2LC & RZ/G2L & RZ/V2L) and Proprietary Codecs (RZ/G2L & RZ/V2L only).
 
 ### Setup Build Directory
 
@@ -128,7 +143,9 @@ Inside build directory, run:
 
 ### Supported Machines
 
-- `rzg2lc-sr-som`: RZ/G2LC SoM on Hummingboard Ripple
+- `rzg2lc-sr-som`: RZ/G2LC SoM on Hummingboard IIoT & Ripple
+- `rzg2l-sr-som`: RZ/G2L SoM on Hummingboard IIoT & Pro & Ripple
+- `rzv2l-sr-som`: RZ/V2L SoM on Hummingboard IIoT & Pro & Ripple
 
 The instructions below use `rzg2lc-sr-som`, substitute as needed.
 
@@ -194,7 +211,6 @@ To re-enable them, **remove or comment** below lines from `meta-rz-qt6/conf/laye
 
     # Remove crypto feature because some boards lack cryptographic hardware support
     TUNE_FEATURES:remove = "crypto"
-
 
 ## Many `-native` recipes fail when host gcc is v15 or later
 
