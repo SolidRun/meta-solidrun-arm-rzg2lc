@@ -12,6 +12,7 @@ IMAGE_INSTALL:append = " \
 	cmake \
 	curl \
 	git \
+	${@bb.utils.contains_any('MACHINE_FEATURES', 'hwh264dec hwh264enc', 'gstreamer1.0-plugins-good', '', d)} \
 	htop \
 	kernel-modules \
 	modemmanager \

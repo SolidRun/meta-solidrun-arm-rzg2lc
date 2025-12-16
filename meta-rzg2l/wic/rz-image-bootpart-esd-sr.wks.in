@@ -24,7 +24,7 @@
 # |   8192 | first partition
 
 part bootparam --source rawcopy --sourceparams="file=bl2_bp_esd-${MACHINE}.bin" --no-table --offset 1s
-part u-boot --source rawcopy --sourceparams="file=fip-${MACHINE}.bin" --no-table --offset 128s
+part u-boot --source rawcopy --sourceparams="file=fip-${MACHINE}.bin" --no-table ${FIP_WIC_OFFSET} --align 64
 part overlays --source rawcopy --sourceparams="file=overlays-${MACHINE}.itb" --no-table --offset 6144s
 part /boot --source bootimg-partition --fstype=vfat --label boot --use-uuid --active --align 8192 --fixed-size 28M --sourceparams="loader=u-boot"
 part / --source rootfs --fstype=ext4 --label rootfs --use-uuid --align 8192 --exclude-path boot/

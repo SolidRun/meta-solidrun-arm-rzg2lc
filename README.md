@@ -62,17 +62,17 @@ Start in a new empty directory with plenty of free disk space - at least 150GB. 
 
 Renesas offers proprietary drivers for graphics and multimedia processing [here](https://www.renesas.com/en/software-tool/rz-mpu-verified-linux-package-61-cip#download):
 
-- RZ MPU Graphics Library V4.1.2.5 for RZ/G2LC & RZ/G2L & RZ/V2L (`RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip`)
+- RZ MPU Graphics Library V4.1.2.6 for RZ/G2LC & RZ/G2L & RZ/V2L (`RTK0EF0045Z14001ZJ-4.1.2.6_EN.zip`)
 
-      unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z14001ZJ-v4.1.2.5_EN/meta-rz-features_graphics_v4.1.2.5.tar.gz
-      tar -xvf meta-rz-features_graphics_v4.1.2.5.tar.gz
+      unzip -j RTK0EF0045Z14001ZJ-4.1.2.6_EN.zip RTK0EF0045Z14001ZJ-4.1.2.6_EN/meta-rz-features_graphics_4.1.2.6.tar.gz
+      tar -xvf meta-rz-features_graphics_4.1.2.6.tar.gz
   
   This shall create in the working directory new path `meta-rz-features/meta-rz-graphics`.
 
-- RZ MPU Video Codec Library V4.1.3.0 for RZ/G2L & RZ/V2L (`RTK0EF0045Z16001ZJ_v4.1.3.0_EN.zip`)
+- RZ MPU Video Codec Library V4.1.3.1 for RZ/G2L & RZ/V2L (`RTK0EF0045Z16001ZJ_v4.1.3.1_EN.zip`)
 
-      unzip -j RTK0EF0045Z14001ZJ-v4.1.2.5_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.0_EN/meta-rz-features_codec_v4.1.3.0.tar.gz
-      tar -xvf meta-rz-features_codec_v4.1.3.0.tar.gz
+      unzip -j RTK0EF0045Z16001ZJ_v4.1.3.1_EN.zip RTK0EF0045Z16001ZJ_v4.1.3.1_EN/meta-rz-features_codec_v4.1.3.1.tar.gz
+      tar -xvf meta-rz-features_codec_v4.1.3.1.tar.gz
   
   This shall create in the working directory new path `meta-rz-features/meta-rz-codecs`.
 
@@ -82,10 +82,10 @@ These packages are optional, yocto can be built without them.
 
 Renesas offers QT support for RZ SoCs [here](https://www.renesas.com/en/software-tool/rz-mpu-qt-package):
 
-Qt6 packages V4.0.0.0 for RZ/G Verified Linux Package V4.0.0 (`RTK0EF0224Z00000ZJ_v4.0.0.0.zip`)
+Qt6 packages V4.0.0.2 for RZ/G Verified Linux Package V4.0.1 (`RTK0EF0224Z00002ZJ_v4.0.0.2.zip`)
 
-    unzip -j RTK0EF0224Z00000ZJ_v4.0.0.0.zip RTK0EF0224Z00000ZJ_v4.0.0.0/rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
-    tar -xvf rzg_bsp_qt6.8.3_v4.0.0.0.tar.gz
+    unzip -j RTK0EF0224Z00002ZJ_v4.0.0.2.zip RTK0EF0224Z00002ZJ_v4.0.0.2/rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
+    tar -xvf rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
 
 This shall create in the working directory new paths `meta-qt6` and `meta-rz-qt6`.
 

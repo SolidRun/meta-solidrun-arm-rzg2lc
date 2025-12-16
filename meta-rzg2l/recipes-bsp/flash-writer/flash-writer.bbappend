@@ -1,6 +1,6 @@
 FLASH_WRITER_URL = "git://github.com/SolidRun/rzg2_flash_writer"
 BRANCH = "solidrun"
-SRCREV = "31cdf49867acc686a6f4c4755d2a9728beb07c95"
+SRCREV:rzg2l-family = "31cdf49867acc686a6f4c4755d2a9728beb07c95"
 
 do_compile:rzg2lc-sr-som() {
 	cd ${S}

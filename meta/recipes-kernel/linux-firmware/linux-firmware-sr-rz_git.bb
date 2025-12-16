@@ -47,9 +47,9 @@ do_install:append() {
 	# - RZ/V2L SoM
 	for board in solidrun,rzg2l-hummingboard-iiot solidrun,rzg2l-hummingboard-pro solidrun,rzg2l-hummingboard-ripple solidrun,rzv2l-hummingboard-iiot solidrun,rzv2l-hummingboard-pro solidrun,rzv2l-hummingboard-ripple; do
 		# Murata 1MW WiFi/BT
-		ln -sv cyfmac43439-sdio.solidrun,rzg2lc-sr-som.bin ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.bin
-		ln -sv cyfmac43439-sdio.solidrun,rzg2lc-sr-som.clm_blob ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.clm_blob
-		ln -sv cyfmac43439-sdio.solidrun,rzg2lc-sr-som.txt ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.txt
+		ln -sv cyfmac43455-sdio.solidrun,rzg2l-sr-som.bin ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.bin
+		ln -sv cyfmac43455-sdio.solidrun,rzg2l-sr-som.clm_blob ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.clm_blob
+		ln -sv cyfmac43455-sdio.solidrun,rzg2l-sr-som.txt ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.$board.txt
 		ln -sv BCM4345C0_${BT_1MW_FWVER}.hcd ${D}${nonarch_base_libdir}/firmware/brcm/BCM4345C0.$board.hcd
 	done
 
