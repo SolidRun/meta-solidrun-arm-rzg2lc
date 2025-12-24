@@ -86,6 +86,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: RZ/G2UL SoM
+            machine: rzg2ul-sr-som
+            cache_key: rzg2ul
+            enable_meta_rz_graphics: false
+            enable_meta_rz_codecs: false
+            enable_meta_rz_qt6: false
+            bitbake_targets:
+              - core-image-full-cmdline
+            publish_artifacts:
+              - core-image-full-cmdline-rzg2ul-sr-som.rootfs.wic.bmap
+              - core-image-full-cmdline-rzg2ul-sr-som.rootfs.wic.gz
+              - core-image-full-cmdline-rzg2ul-sr-som.rootfs.manifest
+              - r9a07g043u12-hummingboard-ripple.dtb
+              - rzg2lc-hummingboard-pulse-leds.dtbo
+              - Image.gz
+              - modules-rzg2ul-sr-som.tgz
+              - bl2_bp_esd-rzg2ul-sr-som.bin
+              - fip-rzg2ul-sr-som.bin
+              - Flash_Writer_SCIF_RZG2UL_HUMMINGBOARD_DDR4_512MB_1PCS.mot
+              - Flash_Writer_SCIF_RZG2UL_HUMMINGBOARD_DDR4_1GB_1PCS.mot
+              - Flash_Writer_SCIF_RZG2UL_HUMMINGBOARD_DDR4_2GB_1PCS.mot
           - name: RZ/G2LC SoM
             machine: rzg2lc-sr-som
             cache_key: rzg2lc
@@ -362,6 +383,7 @@ jobs:
         id: dl_url
         shell: bash {0}
         run: |
+          echo "rzg2ul_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzg2ul-sr-som/core-image-full-cmdline-rzg2ul-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
           echo "rzg2lc_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzg2lc-sr-som/core-image-full-cmdline-rzg2lc-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
           echo "rzg2lc_solidrun_demo_image_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzg2lc-sr-som/solidrun-demo-image-rzg2lc-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
           echo "rzg2l_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzg2l-sr-som/core-image-full-cmdline-rzg2l-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
@@ -387,9 +409,9 @@ jobs:
             [
               {
                 "device_type": "rz",
-                "tags": ["rz_g2lc"],
-                "image_url": "${{ steps.dl_url.outputs.rzg2lc_core_image_full_cmdline_url }}",
-                "description": "RZ/G2LC Yocto - SolidRun Demo - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "tags": ["rz_g2ul"],
+                "image_url": "${{ steps.dl_url.outputs.rzg2ul_core_image_full_cmdline_url }}",
+                "description": "RZ/G2UL Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
               },
@@ -397,6 +419,14 @@ jobs:
                 "device_type": "rz",
                 "tags": ["rz_g2lc"],
                 "image_url": "${{ steps.dl_url.outputs.rzg2lc_solidrun_demo_image_url }}",
+                "description": "RZ/G2LC Yocto - SolidRun Demo - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              },
+              {
+                "device_type": "rz",
+                "tags": ["rz_g2lc"],
+                "image_url": "${{ steps.dl_url.outputs.rzg2lc_core_image_full_cmdline_url }}",
                 "description": "RZ/G2LC Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
@@ -404,7 +434,7 @@ jobs:
               {
                 "device_type": "rz",
                 "tags": ["rz_g2l"],
-                "image_url": "${{ steps.dl_url.outputs.rzg2l_core_image_full_cmdline_url }}",
+                "image_url": "${{ steps.dl_url.outputs.rzg2l_solidrun_demo_image_url }}",
                 "description": "RZ/G2L Yocto - SolidRun Demo - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
@@ -412,16 +442,8 @@ jobs:
               {
                 "device_type": "rz",
                 "tags": ["rz_g2l"],
-                "image_url": "${{ steps.dl_url.outputs.rzg2l_solidrun_demo_image_url }}",
+                "image_url": "${{ steps.dl_url.outputs.rzg2l_core_image_full_cmdline_url }}",
                 "description": "RZ/G2L Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
-                "compression": "gz",
-                "all_devices": false
-              },
-              {
-                "device_type": "rz",
-                "tags": ["rz_v2l"],
-                "image_url": "${{ steps.dl_url.outputs.rzv2l_core_image_full_cmdline_url }}",
-                "description": "RZ/V2L Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
               },
@@ -430,6 +452,14 @@ jobs:
                 "tags": ["rz_v2l"],
                 "image_url": "${{ steps.dl_url.outputs.rzv2l_solidrun_demo_image_url }}",
                 "description": "RZ/V2L Yocto - SolidRun Demo - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              },
+              {
+                "device_type": "rz",
+                "tags": ["rz_v2l"],
+                "image_url": "${{ steps.dl_url.outputs.rzv2l_core_image_full_cmdline_url }}",
+                "description": "RZ/V2L Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
               }

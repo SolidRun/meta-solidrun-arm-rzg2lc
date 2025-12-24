@@ -54,8 +54,9 @@ do_install:append() {
 	done
 
 	# link 1YN firmware and configs for boards with 1YN and common WiFi module design:
+	# - RZ/G2UL SoM
 	# - RZ/G2LC SoM
-	for board in solidrun,rzg2lc-hummingboard-iiot solidrun,rzg2lc-hummingboard-ripple; do
+	for board in solidrun,rzg2ul-hummingboard-ripple solidrun,rzg2lc-hummingboard-iiot solidrun,rzg2lc-hummingboard-ripple; do
 		# Murata 1YN WiFi/BT
 		ln -sv cyfmac43439-sdio.solidrun,rzg2lc-sr-som.bin ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.$board.bin
 		ln -sv cyfmac43439-sdio.solidrun,rzg2lc-sr-som.clm_blob ${D}${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.$board.clm_blob
@@ -82,8 +83,10 @@ PACKAGES += " ${PN}-cyw43439 "
 LICENSE:${PN}-cyw43439 = "Firmware-cypress-murata"
 FILES:${PN}-cyw43439 = " \
 	${nonarch_base_libdir}/firmware/brcm/CYW4343A2_${BT_1YN_FWVER}.hcd \
+	${nonarch_base_libdir}/firmware/brcm/BCM4343A2.solidrun,rzg2ul-hummingboard-ripple.hcd \
 	${nonarch_base_libdir}/firmware/brcm/BCM4343A2.solidrun,rzg2lc-hummingboard-iiot.hcd \
 	${nonarch_base_libdir}/firmware/brcm/BCM4343A2.solidrun,rzg2lc-hummingboard-ripple.hcd \
+	${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.solidrun,rzg2ul-hummingboard-ripple.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.solidrun,rzg2lc-sr-som.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.solidrun,rzg2lc-hummingboard-iiot.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43439-sdio.solidrun,rzg2lc-hummingboard-ripple.* \

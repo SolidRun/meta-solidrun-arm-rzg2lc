@@ -6,6 +6,10 @@ This is the SolidRun Yocto BSP Layer for products based on Renesas SoCs.
 
 Currently the following boards and MPUs are supported:
 
+- [RZ/G2UL SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-g2ul-som/)
+
+  - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
+
 - [RZ/G2LC SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-g2lc-som/)
 
   - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-iot-sbc/)
