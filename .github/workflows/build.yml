@@ -278,7 +278,7 @@ jobs:
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
         run: |
-            TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+            TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzg2l
             if [[ "$META_RZ_GRAPHICS" == "true" ]]; then
