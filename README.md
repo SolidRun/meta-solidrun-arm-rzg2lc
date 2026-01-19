@@ -105,6 +105,7 @@ Then add to `conf/bblayers.conf` the SolidRun meta layers:
 
     BBLAYERS += "${TOPDIR}/../meta-solidrun-arm-rzg2lc/meta"
     BBLAYERS += "${TOPDIR}/../meta-solidrun-arm-rzg2lc/meta-rzg2l"
+    BBLAYERS += "${TOPDIR}/../meta-solidrun-arm-rzg2lc/meta-rzv2n"
 
 Finally review and modify default configuration files as needed:
 
