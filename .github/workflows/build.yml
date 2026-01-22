@@ -194,6 +194,30 @@ jobs:
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_512MB_1PCS.mot
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_1GB_1PCS.mot
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_2GB_1PCS.mot
+          - name: RZ/V2N SoM
+            machine: rzv2n-sr-som
+            cache_key: rzv2n
+            enable_meta_rz_graphics: true
+            enable_meta_rz_codecs: true
+            enable_meta_rz_qt6: true
+            bitbake_targets:
+              - core-image-full-cmdline
+              - solidrun-demo-image
+            publish_artifacts:
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.bmap
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.manifest
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.bmap
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.gz
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.manifest
+              - r9a09g056n44-hummingboard-iiot.dtb
+              - rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo
+              - rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
+              - Image.gz
+              - modules-rzv2n-sr-som.tgz
+              - bl2_bp_mmc-rzv2n-sr-som.bin
+              - fip-rzv2n-sr-som.bin
+              - Flash_Writer_SCIF_RZV2N_DEV_LPDDR4X.mot
     container:
         image: ciserver.ci:5000/${{ github.repository_id }}/scarthgap:latest
         credentials:
@@ -281,6 +305,7 @@ jobs:
             TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzg2l
+            bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzv2n
             if [[ "$META_RZ_GRAPHICS" == "true" ]]; then
               bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
             fi
