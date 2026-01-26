@@ -5,5 +5,5 @@
 #                   Note: the bootloader in first partition cannot be used for eMMC boot. In eMMC boot
 #                         user has to manually write the bootloader to mmcblk0boot0.
 
-part --source bootimg-partition --fstype=vfat --label bootloader --align 1024
+part /boot --source bootimg-partition --fstype=vfat --label boot --use-uuid --active --align 1024 --sourceparams="loader=u-boot"
 part --source rootfs            --fstype=ext4 --label root       --align 4

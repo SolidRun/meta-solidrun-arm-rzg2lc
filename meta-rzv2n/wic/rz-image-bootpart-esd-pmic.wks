@@ -9,5 +9,5 @@
 part --source rawcopy --sourceparams="file=bl2_bp_esd-${MACHINE}_pmic.bin" --no-table
 part --source rawcopy --sourceparams="file=fip-${MACHINE}_pmic.bin" --no-table ${FIP_WIC_OFFSET} --align 64
 
-part --source bootimg-partition --fstype=vfat --label bootloader --align 1024
+part /boot --source bootimg-partition --fstype=vfat --label boot --use-uuid --active --align 1024 --sourceparams="loader=u-boot"
 part --source rootfs            --fstype=ext4 --label root	 --align 4
