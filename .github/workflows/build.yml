@@ -226,7 +226,7 @@ jobs:
               - bl2_bp_mmc-rzv2n-sr-som.srec
               - fip-rzv2n-sr-som.bin
               - fip-rzv2n-sr-som.srec
-              - Flash_Writer_SCIF_RZV2N_DEV_LPDDR4X.mot
+              - Flash_Writer_SCIF_RZV2N_SR_SOM_8GB_LPDDR4X.mot
     container:
         image: ciserver.ci:5000/${{ github.repository_id }}/scarthgap:latest
         credentials:
