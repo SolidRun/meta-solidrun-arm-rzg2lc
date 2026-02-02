@@ -29,9 +29,16 @@ Currently the following boards and MPUs are supported:
   - [HummingBoard Pro](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-sbc/)
   - [HummingBoard Ripple](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2lc-base/)
 
+- [RZ/V2N SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-v2n-som/)
+
+  - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-g2l-iot-sbc/)
+  - [SolidSense AIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/solidsense-aiot/)
+
 ## Binaries
 
-Binaries are generated automatically by our CI infrastructure to [images.solid-run.com](https://images.solid-run.com/RZ/Yocto/vlp4/).
+Binaries are generated automatically by our CI infrastructure:
+
+- RZ/G2L, RZ/G2LC, RZ/G2UL, RZ/V2L, RZ/V2N: [images.solid-run.com/RZ/Yocto/vlp4/](https://images.solid-run.com/RZ/Yocto/vlp4/)
 
 ## Patches
 
@@ -39,7 +46,10 @@ To contribute to this layer you should email patches to support@solid-run.com. P
 
 ## Dependencies
 
-This layer depends on and inherits from [meta-renesas BSP-4.0.0](https://github.com/renesas-rz/meta-renesas/tree/BSP-4.0.0).
+This layer depends on and inherits from [meta-renesas](https://github.com/renesas-rz/meta-renesas):
+
+- RZ/G2L, RZ/G2LC, RZ/G2UL, RZ/V2L: [BSP-4.0.0](https://github.com/renesas-rz/meta-renesas/tree/BSP-4.0.0)
+- RZ/V2N: [RZV2N-BSP-2.0.1](https://github.com/renesas-rz/meta-renesas/tree/RZV2N-BSP-2.0.1)
 
 ## Build Instructions
 
@@ -151,6 +161,7 @@ Inside build directory, run:
 - `rzg2lc-sr-som`: RZ/G2LC SoM on Hummingboard IIoT & Ripple
 - `rzg2l-sr-som`: RZ/G2L SoM on Hummingboard IIoT & Pro & Ripple
 - `rzv2l-sr-som`: RZ/V2L SoM on Hummingboard IIoT & Pro & Ripple
+- `rzv2n-sr-som`: RZ/V2N SoM on HummingBoard IIoT & SolidSense AIoT
 
 The instructions below use `rzg2lc-sr-som`, substitute as needed.
 
@@ -171,6 +182,10 @@ With the build directory set up, any desirable yocto target may be built:
 
     MACHINE=rzg2lc-sr-som bitbake core-image-full-cmdline
 
+Or for RZ/V2N:
+
+    MACHINE=rzv2n-sr-som bitbake core-image-full-cmdline
+
 After completing the images for the target machine will be available in the output directory `tmp/deploy/images/<machine>/`, e.g.:
 
 ```
@@ -187,6 +202,8 @@ lrwxrwxrwx 2 somebody users    66 10. Nov 17:00 core-image-full-cmdline-rzg2lc-s
 -rw-r--r-- 2 somebody users  276K  9. Nov 17:42 Flash_Writer_SCIF_RZG2LC_HUMMINGBOARD_DDR4_512MB_1PCS.mot
 ...
 ```
+
+For the RZ/V2N, key output artifacts include `bl2_bp_spi-rzv2n-sr-som.bin`, `fip-rzv2n-sr-som.bin`, and `Flash_Writer_SCIF_RZV2N_SR_SOM_8GB_LPDDR4X.mot`.
 
 ### Build configs
 
