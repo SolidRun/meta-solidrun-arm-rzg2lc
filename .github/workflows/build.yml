@@ -215,7 +215,7 @@ jobs:
               - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.bmap
               - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.gz
               - solidrun-demo-image-rzv2n-sr-som.rootfs.manifest
-              - r9a09g056n44-hummingboard-iiot.dtb
+              - r9a09g056n48-hummingboard-iiot.dtb
               - rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo
               - rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
               - Image.gz
