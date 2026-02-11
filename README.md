@@ -3,6 +3,16 @@
 This is the SolidRun Yocto BSP Layer for Renesas Landing Page.
 Specific releases are organised in branches below:
 
+- [scarthgap_rzv2n_dev](https://github.com/SolidRun/meta-solidrun-arm-rzg2lc/tree/scarthgap_rzv2n_dev):  Yocto 5.0 Scarthgap - Renesas RZV2N BSP v2.0.1
+
+  Supported Platforms:
+
+  - [RZ/V2N SoM](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/rz-v2n-som/)
+
+    - [HummingBoard IIoT](https://www.solid-run.com/embedded-industrial-iot/renesas-rz-family/hummingboard-rz-series-sbcs/hummingboard-rz-v2n-iiot-sbc/)
+
+  This is a preview version under active development and will be merged into `scarthgap` branch eventually.
+
 - [scarthgap](https://github.com/SolidRun/meta-solidrun-arm-rzg2lc/tree/scarthgap): Yocto 5.0 Scarthgap - Renesas Verified Linux Package v4
 
   Supported Platforms:
