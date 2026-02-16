@@ -1,2 +1,2 @@
-# Override DRP-AI U-Boot patches for SolidRun RZ/V2N kernel fork
-FILESEXTRAPATHS:prepend:rzv2n-sr-som := "${THISDIR}/files:"
+# Skip DRP-AI U-Boot patches that only apply to Renesas EVK/dev boards
+SRC_URI:remove:rzv2n-sr-som = "file://0001-add-ether-setting.patch"
