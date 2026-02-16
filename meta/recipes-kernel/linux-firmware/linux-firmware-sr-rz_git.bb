@@ -54,10 +54,12 @@ do_install:append() {
 		ln -sv BCM4345C0_${BT_1MW_FWVER}.hcd ${D}${nonarch_base_libdir}/firmware/brcm/BCM4345C0.$board.hcd
 	done
 
-	# link brcmfmac firmware for RZ/V2N SoM (brcmfmac driver looks in brcm/ directory)
-	ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.bin ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzv2n-sr-som.bin
-	ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.clm_blob ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzv2n-sr-som.clm_blob
-	ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzv2n-sr-som.txt
+	# link brcmfmac firmware for RZ/V2N boards (brcmfmac driver looks in brcm/ directory)
+	for board in solidrun,rzv2n-sr-som solidrun,rzv2n-hummingboard-iiot solidrun,rzv2n-hummingboard-pro solidrun,rzv2n-hummingboard-pulse solidrun,rzv2n-solidsense-aiot; do
+		ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.bin ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.$board.bin
+		ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.clm_blob ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.$board.clm_blob
+		ln -sv ../cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.txt ${D}${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.$board.txt
+	done
 
 	# link 1YN firmware and configs for boards with 1YN and common WiFi module design:
 	# - RZ/G2UL SoM
@@ -112,7 +114,11 @@ FILES:${PN}-cyw43455 = " \
 	${nonarch_base_libdir}/firmware/brcm/BCM4345C0.solidrun,rzv2n-hummingboard-pro.hcd \
 	${nonarch_base_libdir}/firmware/brcm/BCM4345C0.solidrun,rzv2n-hummingboard-pulse.hcd \
 	${nonarch_base_libdir}/firmware/brcm/BCM4345C0.solidrun,rzv2n-solidsense-aiot.hcd \
-	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.renesas,rzv2n-sr-som.* \
+	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.solidrun,rzv2n-sr-som.* \
+	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.solidrun,rzv2n-hummingboard-iiot.* \
+	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.solidrun,rzv2n-hummingboard-pro.* \
+	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.solidrun,rzv2n-hummingboard-pulse.* \
+	${nonarch_base_libdir}/firmware/brcm/brcmfmac43455-sdio.solidrun,rzv2n-solidsense-aiot.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.solidrun,rzg2l-sr-som.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.solidrun,rzg2l-hummingboard-iiot.* \
 	${nonarch_base_libdir}/firmware/cypress/cyfmac43455-sdio.solidrun,rzg2l-hummingboard-pro.* \
