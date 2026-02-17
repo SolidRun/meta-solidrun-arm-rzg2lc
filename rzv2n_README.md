@@ -84,6 +84,34 @@ When returning to the build directory at a later time the command below should b
     bitbake-layers add-layer ../meta-openembedded/meta-filesystems
     bitbake-layers add-layer ../meta-virtualization
 
+#### ROS2 Humble
+
+ROS2 support is provided by the [Renesas RZ/V2N ROS2 Package](https://github.com/renesas-rz/rzv2n_ros2) which depends on [meta-ros](https://github.com/ros/meta-ros). This requires the proprietary graphics layer (meta-rz-graphics) to be enabled first.
+
+Clone the required repositories from the top-level Yocto directory (above `build/`):
+
+    git clone -b scarthgap https://github.com/ros/meta-ros.git
+    git clone https://github.com/renesas-rz/rzv2n_ros2.git
+    cp -r rzv2n_ros2/meta-rz-features-ros/meta-rzv2-ros-humble .
+
+Copy the ROS2 configuration include file into the build directory and enable it:
+
+    cp rzv2n_ros2/meta-rz-features-ros/ros2.inc build/conf/
+    echo 'require ros2.inc' >> build/conf/local.conf
+
+Then from the build directory, add the ROS2 layers:
+
+    bitbake-layers add-layer ../meta-ros/meta-ros-common
+    bitbake-layers add-layer ../meta-ros/meta-ros2
+    bitbake-layers add-layer ../meta-ros/meta-ros2-humble
+    bitbake-layers add-layer ../meta-rzv2-ros-humble
+
+**Note:** The ROS2 build requires network access to fetch some packages. The `ros2.inc` file sets `BB_NO_NETWORK = "0"` automatically.
+
+**Note:** The `meta-rzv2-ros-humble` layer includes a `librealsense2` bbappend that requires the Intel RealSense recipe. If you are not using a RealSense camera, add the following to `conf/local.conf` to avoid the dangling bbappend error:
+
+    BB_DANGLINGAPPENDS_WARNONLY = "1"
+
 ### Full AI Build
 
 To enable all proprietary features (graphics, codecs, DRP-AI) along with Docker support, run all layer additions together:
