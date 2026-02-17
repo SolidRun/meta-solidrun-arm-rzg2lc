@@ -11,4 +11,7 @@ IMAGE_INSTALL:append:rzv2n-sr-som = " \
 	fb-test \
 	python3-pillow \
 	python3-numpy \
+	evtest \
+	xcursor-transparent-theme \
+	adwaita-icon-theme \
 "
