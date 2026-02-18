@@ -25,30 +25,37 @@ For Podman:
 
 Start in a new empty directory with plenty of free disk space - at least 150GB. Then download the build recipes:
 
-    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
+    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap_rzv2n_dev -m meta-solidrun-arm-rz.xml
     repo sync
 
 ### Optional Proprietary Packages
 
 Renesas offers proprietary drivers for graphics, video codecs, and AI acceleration as part of the [RZ/V2N AI SDK](https://www.renesas.com/en/software-tool/rzv2n-ai-software-development-kit).
 
-Download the RZ/V2N AI SDK source package (`RTK0EF0189F06000SJ_linux-src.zip`) and extract the meta-rz-features layers:
+To obtain the RZ/V2N AI SDK v6.00 source code:
+
+1. Visit the [RZ/V2N AI SDK build instructions](https://renesas-rz.github.io/rzv_ai_sdk/6.00/howto_build_aisdk_v2n.html) page.
+2. Follow the link to download the [RZ/V2N AI SDK v6.00 Source Code](https://www.renesas.com/en/document/sws/rzv2n-ai-sdk-v600-source-code) (`RTK0EF0189F06000SJ_linux-src.zip`).
+
+Extract the archive and copy `meta-rz-features` into the Yocto workspace (alongside `meta-solidrun-arm-rzg2lc`):
 
     unzip RTK0EF0189F06000SJ_linux-src.zip
+    cp -r meta-rz-features/ <your-yocto-workspace>/
 
-This shall create in the working directory `meta-rz-features/` containing:
+This provides the following layers needed when enabling GPU, DRP-AI, codecs, or OpenCVA support:
 
 - `meta-rz-graphics` - Mali GPU library
 - `meta-rz-codecs` - Video codec and DRP library
 - `meta-rz-drpai` - DRP-AI accelerator support
 - `meta-rz-opencva` - OpenCV accelerator
-These packages are optional, yocto can be built without them.
+
+These packages are optional — Yocto can be built without them.
 
 ## Setup Build Directory
 
 Initialise a new build directory from Renesas configuration templates:
 
-    TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+    TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
 
 Then add to `conf/bblayers.conf` the SolidRun meta layers:
 
@@ -94,9 +101,9 @@ Clone the required repositories from the top-level Yocto directory (above `build
     git clone https://github.com/renesas-rz/rzv2n_ros2.git
     cp -r rzv2n_ros2/meta-rz-features-ros/meta-rzv2-ros-humble .
 
-Copy the ROS2 configuration include file into the build directory and enable it:
+Apply the ROS2 patch to configure the meta-ros layer and generate `build/conf/ros2.inc`:
 
-    cp rzv2n_ros2/meta-rz-features-ros/ros2.inc build/conf/
+    patch -p0 < rzv2n_ros2/meta-rz-features-ros/meta-ros-humble.patch
     echo 'require ros2.inc' >> build/conf/local.conf
 
 Then from the build directory, add the ROS2 layers:

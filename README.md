@@ -69,7 +69,7 @@ For Podman:
 
 Start in a new empty directory with plenty of free disk space - at least 150GB. Then download the build recipes:
 
-    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
+    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap_rzv2n_dev -m meta-solidrun-arm-rz.xml
     repo sync
 
 #### Optional Proprietary Graphics & Multimedia Packages
@@ -109,7 +109,7 @@ Note that RZ QT depoends on Proprietary Graphics Layer (RZ/G2LC & RZ/G2L & RZ/V2
 
 Initialise a new build directory from Renesas configuration templates:
 
-    TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+    TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
 
 Then add to `conf/bblayers.conf` the SolidRun meta layers:
 
