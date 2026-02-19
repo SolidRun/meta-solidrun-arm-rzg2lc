@@ -14,4 +14,5 @@ IMAGE_INSTALL:append:rzv2n-sr-som = " \
 	evtest \
 	xcursor-transparent-theme \
 	adwaita-icon-theme \
+	v4l2-init-scripts \
 "
