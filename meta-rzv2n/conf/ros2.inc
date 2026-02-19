@@ -146,9 +146,10 @@ PACKAGECONFIG:append:pn-nativesdk-opencv = " gtk"
 IMAGE_INSTALL:append = " sudo"
 IMAGE_INSTALL:append = " libgomp libgomp-dev libgomp-staticdev"
 
-# Skip License QA
+# Skip License QA - many ROS2 recipes list "BSD" which doesn't match
+# the collected license files (e.g. BSD-3-Clause)
 INHERIT:remove = "create-spdx"
-WARN_QA:remove = "license-exists"
+WARN_QA:remove = "license-exists license-file-missing"
 
 # Enable network access for git fetches
 BB_NO_NETWORK = "0"
