@@ -101,10 +101,11 @@ Clone the required repositories from the top-level Yocto directory (above `build
     git clone https://github.com/renesas-rz/rzv2n_ros2.git
     cp -r rzv2n_ros2/meta-rz-features-ros/meta-rzv2-ros-humble .
 
-Apply the ROS2 patch to configure the meta-ros layer and generate `build/conf/ros2.inc`:
+Enable the ROS2 package configuration by adding the following to `conf/local.conf`:
 
-    patch -p0 < rzv2n_ros2/meta-rz-features-ros/meta-ros-humble.patch
-    echo 'require ros2.inc' >> build/conf/local.conf
+    include conf/ros2.inc
+
+The `ros2.inc` file is provided by the `meta-rzv2n` layer (at `meta-rzv2n/conf/ros2.inc`) and includes the ROS2 package list, Mali GPU provider preferences, and build fixes. It is based on the Renesas `meta-ros-humble.patch` with fixes for packages that have missing dependencies.
 
 Then from the build directory, add the ROS2 layers:
 
