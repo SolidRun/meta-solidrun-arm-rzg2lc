@@ -120,6 +120,36 @@ Then from the build directory, add the ROS2 layers:
 
     BB_DANGLINGAPPENDS_WARNONLY = "1"
 
+#### Testing ROS2
+
+After booting the image on the board, verify ROS2 is working with the talker/listener demo. Open two SSH sessions to the board:
+
+**Terminal 1** — start the C++ talker node:
+
+    source /opt/ros/humble/setup.bash
+    ros2 run demo_nodes_cpp talker
+
+Expected output:
+
+    [INFO] [talker]: Publishing: 'Hello World: 1'
+    [INFO] [talker]: Publishing: 'Hello World: 2'
+
+**Terminal 2** — start the Python listener node:
+
+    source /opt/ros/humble/setup.bash
+    ros2 run demo_nodes_py listener
+
+Expected output:
+
+    [INFO] [listener]: I heard: [Hello World: 1]
+    [INFO] [listener]: I heard: [Hello World: 2]
+
+Useful commands for inspecting the ROS2 environment:
+
+    ros2 topic list          # list active topics (e.g. /chatter)
+    ros2 node list           # list active nodes (e.g. /talker, /listener)
+    ros2 topic echo /chatter # print messages on a topic
+
 ### Full AI Build
 
 To enable all proprietary features (graphics, codecs, DRP-AI) along with Docker support, run all layer additions together:
@@ -137,6 +167,23 @@ To enable all proprietary features (graphics, codecs, DRP-AI) along with Docker 
 - `core-image-minimal`
 - `core-image-full-cmdline`: cli image
 - `core-image-weston`: graphical image
+
+### Graphics and Weston
+
+The `core-image-weston` target includes a Weston compositor configured with the DRM backend. It works in two modes depending on available libraries:
+
+- **With Mali GPU** (`meta-rz-graphics` enabled): Weston uses the GL renderer for hardware-accelerated compositing.
+- **Without Mali GPU**: Weston uses the pixman software renderer. Add `use-pixman=true` to the `[core]` section of `/etc/xdg/weston/weston.ini` on the target:
+
+      [core]
+      backend=drm
+      use-pixman=true
+
+To verify GPU acceleration is active on the board:
+
+    dmesg | grep -i mali        # should show "Probed as mali0"
+    lsmod | grep mali            # should show mali_kbase loaded
+    weston-simple-egl            # should report ~60 FPS
 
 ## Build
 
@@ -164,3 +211,20 @@ Or:
     zcat tmp/deploy/images/rzv2n-sr-som/core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz | dd of=/dev/sdX bs=1M iflag=fullblock oflag=direct status=progress
 
 For firmware flashing (BL2, FIP, Flash Writer), refer to the SolidRun [RZ/V2N SoM documentation](https://solidrun.atlassian.net/wiki/spaces/developer/pages/661307393/).
+
+## Device Tree Overlays
+
+Optional hardware such as the DSI display panel and MIPI-CSI camera can be enabled via device tree overlays in `extlinux.conf`. After flashing the SD card, mount the boot partition and edit `/boot/extlinux/extlinux.conf`:
+
+    label linux
+      kernel ../Image
+      devicetree ../renesas/r9a09g056n48-hummingboard-iiot.dtb
+      fdtoverlays ../renesas/rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo ../renesas/rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
+      append root=/dev/mmcblk0p2 rootwait
+
+Available overlays:
+
+- `rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo` - Winstar 7" DSI display panel
+- `rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo` - Sony IMX678 MIPI-CSI camera
+
+Each overlay can be used independently — include only the ones for connected hardware.
