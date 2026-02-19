@@ -10,10 +10,10 @@ SRC_URI = "file://v4l2n-init-imx678-dev.sh"
 S = "${WORKDIR}"
 
 do_install() {
-    install -d ${D}/home/root
-    install -m 0755 v4l2n-init-imx678-dev.sh ${D}/home/root/v4l2n-init-imx678-dev.sh
+    install -d ${D}/root
+    install -m 0755 v4l2n-init-imx678-dev.sh ${D}/root/v4l2n-init-imx678-dev.sh
 }
 
-FILES:${PN} = "/home/root/v4l2n-init-imx678-dev.sh"
+FILES:${PN} = "/root/v4l2n-init-imx678-dev.sh"
 
 RDEPENDS:${PN} = "media-ctl v4l-utils"
