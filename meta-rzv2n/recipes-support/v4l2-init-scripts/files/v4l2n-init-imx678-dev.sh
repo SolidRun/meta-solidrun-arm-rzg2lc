@@ -10,17 +10,18 @@
 #   Video   : /dev/video0
 #
 # The IMX678 outputs SRGGB12_1X12 (12-bit raw Bayer).
-# The RZ/V2N CRU can:
-#   - Pass through raw Bayer (CR12 format, 12-bit CRU packed)
-#   - Demosaic Bayer→YUV for display (YUYV format)
+# RZ/V2N CRU does NOT support HW demosaicing (Bayer→YUV).
+# For display: use RGGB (8-bit Bayer) + GStreamer bayer2rgb.
+# For raw capture: use CR12 (12-bit CRU packed) + v4l2-ctl.
 #
-# Requires kernel patch:
+# Note: Output is greyscale because 12-bit sensor data is truncated
+# to 8-bit by the CRU. This is expected with RGGB format.
+#
+# Requires kernel patches:
+#   - 0001-media-rzg2l-cru-increase-CSI-2-max-width-to-4095-for.patch
 #   - 0002-media-imx678-fix-pixel-rate-and-link-freq-for-SDR-mo.patch
 #
-# Note: RZ/V2N CSI-2 max width is 2800 pixels. 4K (3840x2160) is NOT
-# supported. Use 1920x1080 (IMX678 binning mode).
-#
-# Supported resolutions: 1920x1080
+# Supported resolutions: 3840x2160 (default), 1920x1080
 
 MEDIA_DEV="/dev/media0"
 VIDEO_DEV="/dev/video0"
@@ -30,20 +31,21 @@ CSI2="csi-16010400.csi21"
 CRU="cru-ip-16010000.video1"
 
 MEDIA_FMT="SRGGB12_1X12"
-DEFAULT_RES="1920x1080"
+DEFAULT_RES="3840x2160"
 
 # --- Usage ---
 print_usage() {
-    echo "Usage: $0 [--raw]"
+    echo "Usage: $0 [resolution] [--raw]"
     echo ""
-    echo "Resolution: 1920x1080 (CSI-2 max width is 2800, 4K not supported)"
+    echo "Resolutions: 3840x2160 (default), 1920x1080"
     echo "Options:"
-    echo "  --raw    Use CR12 raw Bayer output (for v4l2-ctl capture, no display)"
-    echo "           Default is YUYV (CRU demosaicing for GStreamer display)"
+    echo "  --raw    Use CR12 raw Bayer output (12-bit packed, for v4l2-ctl capture)"
+    echo "           Default is RGGB (8-bit Bayer for GStreamer bayer2rgb display)"
     echo ""
     echo "Examples:"
-    echo "  $0                    # 1920x1080, YUYV for display"
-    echo "  $0 --raw              # 1920x1080, CR12 raw capture"
+    echo "  $0                    # 3840x2160, RGGB for display"
+    echo "  $0 1920x1080          # 1080p, RGGB for display"
+    echo "  $0 --raw              # 3840x2160, CR12 raw capture"
 }
 
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -58,10 +60,18 @@ imx678_res="$DEFAULT_RES"
 for arg in "$@"; do
     case "$arg" in
         --raw) RAW_MODE=1 ;;
+        [0-9]*x[0-9]*) imx678_res="$arg" ;;
     esac
 done
 
-echo "Resolution: ${imx678_res} (1080p @ 30fps, binning mode)"
+case "$imx678_res" in
+    3840x2160) echo "Resolution: 3840x2160 (4K @ 30fps)" ;;
+    1920x1080) echo "Resolution: 1920x1080 (1080p @ 30fps, binning)" ;;
+    *)
+        echo "WARNING: $imx678_res may not be supported by the IMX678 driver."
+        echo "Supported: 3840x2160, 1920x1080"
+        ;;
+esac
 
 # --- Detect devices ---
 cru_name=$(cat /sys/class/video4linux/video*/name 2>/dev/null | grep -i "CRU" | head -1)
@@ -113,9 +123,9 @@ if [ "$RAW_MODE" -eq 1 ]; then
     v4l2-ctl -d $VIDEO_DEV --set-fmt-video=width=${width},height=${height},pixelformat=CR12
     V4L2_FMT="CR12"
 else
-    # YUYV: CRU demosaics Bayer→YUV for GStreamer display
-    v4l2-ctl -d $VIDEO_DEV --set-fmt-video=width=${width},height=${height},pixelformat=YUYV
-    V4L2_FMT="YUYV"
+    # RGGB: 8-bit Bayer for GStreamer bayer2rgb display
+    v4l2-ctl -d $VIDEO_DEV --set-fmt-video=width=${width},height=${height},pixelformat=RGGB
+    V4L2_FMT="RGGB"
 fi
 
 echo ""
@@ -143,25 +153,25 @@ else
     echo ""
     echo "  Live display (scaled to 1024x600):"
     echo "    gst-launch-1.0 v4l2src device=$VIDEO_DEV ! \\"
-    echo "      video/x-raw,format=YUY2,width=${width},height=${height},framerate=30/1 ! \\"
+    echo "      video/x-bayer,format=rggb,width=${width},height=${height} ! \\"
     echo "      queue leaky=downstream max-size-buffers=2 ! \\"
-    echo "      videoconvert ! videoscale ! \\"
+    echo "      bayer2rgb ! videoconvert ! videoscale ! \\"
     echo "      video/x-raw,width=1024,height=600 ! \\"
     echo "      waylandsink sync=false"
     echo ""
     echo "  Full resolution display:"
     echo "    gst-launch-1.0 v4l2src device=$VIDEO_DEV ! \\"
-    echo "      video/x-raw,format=YUY2,width=${width},height=${height},framerate=30/1 ! \\"
+    echo "      video/x-bayer,format=rggb,width=${width},height=${height} ! \\"
     echo "      queue leaky=downstream max-size-buffers=2 ! \\"
-    echo "      videoconvert ! waylandsink sync=false"
+    echo "      bayer2rgb ! videoconvert ! waylandsink sync=false"
     echo ""
     echo "  Save snapshot as PNG:"
     echo "    gst-launch-1.0 v4l2src device=$VIDEO_DEV num-buffers=1 ! \\"
-    echo "      video/x-raw,format=YUY2,width=${width},height=${height} ! \\"
-    echo "      videoconvert ! pngenc ! filesink location=/tmp/snapshot.png"
+    echo "      video/x-bayer,format=rggb,width=${width},height=${height} ! \\"
+    echo "      bayer2rgb ! videoconvert ! pngenc ! filesink location=/tmp/snapshot.png"
     echo ""
-    echo "NOTE: CRU demosaicing from 12-bit Bayer may produce greyscale."
-    echo "      If colors look wrong, the HW demosaicing may not fully"
-    echo "      support 12-bit input. Use --raw for correct raw data."
+    echo "NOTE: Image will appear greyscale. The 12-bit sensor data is"
+    echo "      truncated to 8-bit by the CRU. This is a known limitation."
+    echo "      Use --raw for full 12-bit raw data capture."
 fi
 echo ""

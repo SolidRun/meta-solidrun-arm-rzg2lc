@@ -1,0 +1,68 @@
+From 76a809f98a8fb1941071a52aeb919a94a27752f0 Mon Sep 17 00:00:00 2001
+From: Yazan Shhady <yazan.shhady@solid-run.com>
+Date: Thu, 19 Feb 2026 13:00:24 +0200
+Subject: [PATCH] arm64: dts: rzv2n: fix tca6416_u21 IRQ and touchscreen
+ support
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+ .../renesas/rzv2n-hummingboard-iiot-common.dtsi  | 16 +++++++++-------
+ ...ummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dts |  2 +-
+ 2 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-common.dtsi b/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-common.dtsi
+index f8ca1db4c943..6ca157fab123 100644
+--- a/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-common.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-common.dtsi
+@@ -315,13 +315,17 @@ TCA_VIDEO_PWR_EN {
+ 	};
+ 
+ 	tca6416_u21: gpio@21 {
++		/*
++		 * This is a TI TCAL6416 using same programming model as
++		 * NXP PCAL6416, not to be confused with TI TCA6416.
++		 */
+ 		compatible = "nxp,pcal6416";
+ 		reg = <0x21>;
+ 		gpio-controller;
+ 		#gpio-cells = <2>;
+ 		interrupt-controller;
+ 		#interrupt-cells = <2>;
+-		interrupts-extended = <&pinctrl RZG2L_GPIO(9, 5) IRQ_TYPE_LEVEL_LOW>; // IRQ_TYPE_EDGE_FALLING
++		interrupts-extended = <&pinctrl RZG2L_GPIO(9, 5) IRQ_TYPE_EDGE_FALLING>;
+ 		gpio-line-names =
+ 		"TCA_SPI_TPM/EXT",
+ 		"TCA_TPM_RST#",
+@@ -368,12 +372,10 @@ m2-m-clkreq-hog {
+ 			line-name = "m2-m-clkreq";
+ 		};
+ 
+-		lvds-irq-hog {
+-			gpio-hog;
+-			gpios = <13 (GPIO_ACTIVE_LOW | GPIO_PULL_UP | GPIO_OPEN_DRAIN)>;
+-			input;
+-			line-name = "lvds-irq";
+-		};
++		/*
++		 * Line 13 is used as touchscreen IRQ by the DSI panel
++		 * overlay. Do not hog it to avoid conflict.
++		 */
+ 	};
+ 
+ 	carrier_eeprom: at24c02@57 {
+diff --git a/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dts b/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dts
+index 382851844c10..cdb634fa6e4f 100644
+--- a/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dts
++++ b/arch/arm64/boot/dts/renesas/rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dts
+@@ -29,7 +29,7 @@ touchscreen@41 {
+ 		reg = <0x41>;
+ 		compatible = "ilitek,ili2130";
+ 		reset-gpios = <&gpio_dsi_expander 6 GPIO_ACTIVE_LOW>;
+-		interrupts-extended = <&tca6416_u21 13 IRQ_TYPE_EDGE_FALLING>;
++		interrupts-extended = <&tca6416_u21 13 IRQ_TYPE_LEVEL_LOW>;
+ 		vcc-lcd-supply = <&reg_dsi_panel>;
+ 	};
+ };
+-- 
+2.25.1
+
