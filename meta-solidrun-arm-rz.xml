@@ -11,8 +11,8 @@
 
   <project name="meta-arm" remote="yp" path="meta-arm" revision="refs/tags/yocto-5.0.2" upstream="scarthgap"/>
   <project name="meta-openembedded" remote="oe-mirror" path="meta-openembedded" revision="c29a18fa39ede952f3f6108ec007c1906e2d9a0d" upstream="scarthgap"/>
-  <project name="meta-renesas" remote="rz" path="meta-renesas" revision="refs/tags/BSP-4.0.1" upstream="BSP-4.0.1"/>
-  <project name="meta-solidrun-arm-rzg2lc" remote="sr" path="meta-solidrun-arm-rzg2lc" revision="scarthgap" upstream="scarthgap"/>
+  <project name="meta-renesas" remote="rz" path="meta-renesas" revision="refs/tags/RZV2N-BSP-2.0.1" upstream="scarthgap"/>
+  <project name="meta-solidrun-arm-rzg2lc" remote="sr" path="meta-solidrun-arm-rzg2lc" revision="scarthgap_rzv2n_dev" upstream="scarthgap"/>
   <project name="meta-virtualization" remote="yp" path="meta-virtualization" revision="02f72c96bf9acd0bd3ae0463f482bce8feabe749" upstream="scarthgap"/>
   <project name="poky" remote="yp-mirror" path="poky" revision="refs/tags/scarthgap-5.0.11" upstream="scarthgap"/>
 </manifest>

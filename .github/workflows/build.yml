@@ -89,6 +89,7 @@ jobs:
           - name: RZ/G2UL SoM
             machine: rzg2ul-sr-som
             cache_key: rzg2ul
+            meta_layer: meta-rzg2l
             enable_meta_rz_graphics: false
             enable_meta_rz_codecs: false
             enable_meta_rz_qt6: false
@@ -110,6 +111,7 @@ jobs:
           - name: RZ/G2LC SoM
             machine: rzg2lc-sr-som
             cache_key: rzg2lc
+            meta_layer: meta-rzg2l
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: false
             enable_meta_rz_qt6: true
@@ -139,6 +141,7 @@ jobs:
           - name: RZ/G2L SoM
             machine: rzg2l-sr-som
             cache_key: rzg2l
+            meta_layer: meta-rzg2l
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: true
             enable_meta_rz_qt6: true
@@ -168,6 +171,7 @@ jobs:
           - name: RZ/V2L SoM
             machine: rzv2l-sr-som
             cache_key: rzv2l
+            meta_layer: meta-rzg2l
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: true
             enable_meta_rz_qt6: true
@@ -194,6 +198,35 @@ jobs:
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_512MB_1PCS.mot
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_1GB_1PCS.mot
               - Flash_Writer_SCIF_RZV2L_HUMMINGBOARD_DDR4_2GB_1PCS.mot
+          - name: RZ/V2N SoM
+            machine: rzv2n-sr-som
+            cache_key: rzv2n
+            meta_layer: meta-rzv2n
+            enable_meta_rz_graphics: true
+            enable_meta_rz_codecs: true
+            enable_meta_rz_qt6: true
+            bitbake_targets:
+              - core-image-full-cmdline
+              - solidrun-demo-image
+            publish_artifacts:
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.bmap
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz
+              - core-image-full-cmdline-rzv2n-sr-som.rootfs.manifest
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.bmap
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.gz
+              - solidrun-demo-image-rzv2n-sr-som.rootfs.manifest
+              - r9a09g056n48-hummingboard-iiot.dtb
+              - rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo
+              - rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
+              - Image.gz
+              - modules-rzv2n-sr-som.tgz
+              - bl2_bp_spi-rzv2n-sr-som.bin
+              - bl2_bp_spi-rzv2n-sr-som.srec
+              - bl2_bp_mmc-rzv2n-sr-som.bin
+              - bl2_bp_mmc-rzv2n-sr-som.srec
+              - fip-rzv2n-sr-som.bin
+              - fip-rzv2n-sr-som.srec
+              - Flash_Writer_SCIF_RZV2N_SR_SOM_8GB_LPDDR4X.mot
     container:
         image: ciserver.ci:5000/${{ github.repository_id }}/scarthgap:latest
         credentials:
@@ -274,13 +307,14 @@ jobs:
       - name: Configure
         shell: bash {0}
         env:
+          META_LAYER: ${{ matrix.meta_layer }}
           META_RZ_GRAPHICS: ${{ matrix.enable_meta_rz_graphics }}
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
         run: |
-            TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/rz-conf/ source poky/oe-init-build-env build
+            TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
-            bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta-rzg2l
+            bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/$META_LAYER
             if [[ "$META_RZ_GRAPHICS" == "true" ]]; then
               bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
             fi
