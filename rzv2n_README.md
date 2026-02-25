@@ -200,6 +200,27 @@ After completing, the images will be available in `tmp/deploy/images/rzv2n-sr-so
 - `Flash_Writer_SCIF_RZV2N_SR_SOM_8GB_LPDDR4X.mot` - Flash Writer
 - `core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz` - SD card image
 
+## U-Boot Environment Storage
+
+By default, U-Boot stores its environment in **SPI flash** at offset `0x001E0000` with a sector size of `0x20000` (`CONFIG_ENV_IS_IN_SPI_FLASH=y`).
+
+For systems booting from **eMMC**, the U-Boot configuration must be modified to store the environment on eMMC instead. Create a config fragment in your meta layer:
+
+**File:** `meta-rzv2n/recipes-bsp/u-boot/u-boot-renesas/emmc-env.cfg`
+
+    # Use eMMC for U-Boot environment instead of SPI flash
+    # CONFIG_ENV_IS_IN_SPI_FLASH is not set
+    CONFIG_ENV_IS_IN_MMC=y
+    CONFIG_SYS_MMC_ENV_DEV=0
+    CONFIG_SYS_MMC_ENV_PART=1
+
+**File:** `meta-rzv2n/recipes-bsp/u-boot/u-boot-renesas_%.bbappend`
+
+    FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}:"
+    SRC_URI:append = " file://emmc-env.cfg"
+
+This will apply the eMMC environment configuration during the U-Boot build.
+
 ## Flashing
 
 Write the SD card image using bmaptool or dd:
