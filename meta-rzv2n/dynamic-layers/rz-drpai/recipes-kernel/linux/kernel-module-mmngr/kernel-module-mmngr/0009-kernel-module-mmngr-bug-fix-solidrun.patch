@@ -1,0 +1,52 @@
+From 43f53a4f3add78027870ed3abb19d91f4305e15f Mon Sep 17 00:00:00 2001
+From: canhdao <canh.dao.ct@renesas.com>
+Date: Tue, 25 Feb 2025 10:33:03 +0700
+Subject: [PATCH] kernel-module-mmngr-bug-fix
+
+Use copy_from_user instead of direct pointer cast for cache ioctl
+parameters. Cast arg to void __user * and check return value.
+
+Signed-off-by: canhdao <canh.dao.ct@renesas.com>
+---
+ .../mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+index 09b189d..4a5896e 100644
+--- a/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
++++ b/mmngr_drv/mmngr/mmngr-module/files/mmngr/drv/mmngr_drv.c
+@@ -932,7 +932,7 @@ static long ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 	int		ercd;
+ 	int		ret;
+ 	struct MM_PARAM	*p = file->private_data;
+-	struct MM_CACHE_PARAM *cachep;
++	struct MM_CACHE_PARAM cachep;
+ 	struct device	*mm_dev;
+
+ 	mm_dev = mm_drvdata->mm_dev;
+@@ -985,14 +985,16 @@ static long ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 		}
+ 		break;
+ 	case MM_IOC_FLUSH:
+-		cachep = (struct MM_CACHE_PARAM *)arg;
+-		dma_sync_single_for_device(mm_dev, p->hard_addr + cachep->offset,
+-					   cachep->len, DMA_FROM_DEVICE);
++		if (copy_from_user(&cachep, (void __user *)arg, sizeof(struct MM_CACHE_PARAM)))
++			return -EFAULT;
++		dma_sync_single_for_device(mm_dev, p->hard_addr + cachep.offset,
++					cachep.len, DMA_FROM_DEVICE);
+ 		break;
+ 	case MM_IOC_INVAL:
+-		cachep = (struct MM_CACHE_PARAM *)arg;
+-		dma_sync_single_for_cpu(mm_dev, p->hard_addr + cachep->offset,
+-					cachep->len, DMA_TO_DEVICE);
++		if (copy_from_user(&cachep, (void __user *)arg, sizeof(struct MM_CACHE_PARAM)))
++			return -EFAULT;
++		dma_sync_single_for_cpu(mm_dev, p->hard_addr + cachep.offset,
++					cachep.len, DMA_TO_DEVICE);
+ 		break;
+ 	case MM_IOC_VTOP:   /* change virtual address to physical address */
+ 		{
+--
+2.25.1
+
