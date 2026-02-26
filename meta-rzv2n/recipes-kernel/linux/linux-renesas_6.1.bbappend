@@ -1,8 +1,8 @@
 # Add this layer to SRC_URI search path
 FILESEXTRAPATHS:prepend := "${THISDIR}/6.1-solidrun:"
 
-# use solidrun fork
-KERNEL_URL = "git://github.com/SolidRun/linux-stable.git;protocol=https"
+# use solidrun fork (apply to RZ/V2N machines)
+KERNEL_URL:rzv2n-sr-som = "git://github.com/SolidRun/linux-stable.git;protocol=https"
 KERNEL_BRANCH:rzv2n-sr-som = "rz-6.1-cip43"
 LINUX_VERSION:rzv2n-sr-som = "6.1.141-cip43"
 KERNEL_REV:rzv2n-sr-som = "ac6e7becdfdc3d553aa2617d53f364afd41ec4b9"
