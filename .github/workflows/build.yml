@@ -202,20 +202,24 @@ jobs:
             machine: rzv2n-sr-som
             cache_key: rzv2n
             meta_layer: meta-rzv2n
-            enable_meta_rz_graphics: true
-            enable_meta_rz_codecs: true
-            enable_meta_rz_qt6: true
+            enable_meta_rz_graphics: false
+            enable_meta_rz_codecs: false
+            enable_meta_rz_qt6: false
+            enable_meta_rz_features_v2n: true
+            enable_ros2: true
             bitbake_targets:
               - core-image-full-cmdline
-              - solidrun-demo-image
+              - core-image-weston
             publish_artifacts:
               - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.bmap
               - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz
               - core-image-full-cmdline-rzv2n-sr-som.rootfs.manifest
-              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.bmap
-              - solidrun-demo-image-rzv2n-sr-som.rootfs.wic.gz
-              - solidrun-demo-image-rzv2n-sr-som.rootfs.manifest
+              - core-image-weston-rzv2n-sr-som.rootfs.wic.bmap
+              - core-image-weston-rzv2n-sr-som.rootfs.wic.gz
+              - core-image-weston-rzv2n-sr-som.rootfs.manifest
               - r9a09g056n48-hummingboard-iiot.dtb
+              - r9a09g056n48-rzv2n-evk.dtb
+              - r9a09g056n48-solidsense-aiot.dtb
               - rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo
               - rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
               - Image.gz
@@ -265,6 +269,7 @@ jobs:
           META_RZ_GRAPHICS: ${{ matrix.enable_meta_rz_graphics }}
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
+          META_RZ_FEATURES_V2N: ${{ matrix.enable_meta_rz_features_v2n }}
         run: |
           # meta-rz-graphics
           if [[ "$META_RZ_GRAPHICS" == "true" ]]; then
@@ -286,6 +291,20 @@ jobs:
             unzip -j RTK0EF0224Z00002ZJ_v4.0.0.2.zip RTK0EF0224Z00002ZJ_v4.0.0.2/rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
             tar -xf rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
           fi
+
+          # meta-rz-features for V2N (combined graphics, codecs, drpai, opencv)
+          if [[ "$META_RZ_FEATURES_V2N" == "true" ]]; then
+            s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-v2n/meta-rz-features-v2n-sdk-v6.0.tar.gz
+            tar -xzf meta-rz-features-v2n-sdk-v6.0.tar.gz
+          fi
+
+      - name: Fetch ROS2 Layers
+        if: ${{ matrix.enable_ros2 }}
+        shell: bash -e {0}
+        run: |
+          git clone -b scarthgap https://github.com/ros/meta-ros.git
+          git clone https://github.com/renesas-rz/rzv2n_ros2.git
+          cp -r rzv2n_ros2/meta-rz-features-ros/meta-rzv2-ros-humble .
 
       - name: Create cache dir
         run: mkdir -p buildcache
@@ -311,6 +330,8 @@ jobs:
           META_RZ_GRAPHICS: ${{ matrix.enable_meta_rz_graphics }}
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
+          META_RZ_FEATURES_V2N: ${{ matrix.enable_meta_rz_features_v2n }}
+          ROS2: ${{ matrix.enable_ros2 }}
         run: |
             TEMPLATECONF=$PWD/meta-renesas/meta-rz-distro/conf/templates/vlp-v4-conf/ source poky/oe-init-build-env build
             bitbake-layers add-layer ../meta-solidrun-arm-rzg2lc/meta
@@ -325,6 +346,19 @@ jobs:
               bitbake-layers add-layer ../meta-qt6
               bitbake-layers add-layer ../meta-rz-qt6
               sed -i 's;^\(TUNE_FEATURES:remove = "crypto"\)$;# \1;g' ../meta-rz-qt6/conf/layer.conf
+            fi
+            if [[ "$META_RZ_FEATURES_V2N" == "true" ]]; then
+              bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
+              bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
+              bitbake-layers add-layer ../meta-rz-features/meta-rz-drpai
+              bitbake-layers add-layer ../meta-rz-features/meta-rz-opencva
+            fi
+            if [[ "$ROS2" == "true" ]]; then
+              bitbake-layers add-layer ../meta-ros/meta-ros-common
+              bitbake-layers add-layer ../meta-ros/meta-ros2
+              bitbake-layers add-layer ../meta-ros/meta-ros2-humble
+              bitbake-layers add-layer ../meta-rzv2-ros-humble
+              echo "include conf/ros2.inc" >> conf/local.conf
             fi
             bitbake-layers add-layer ../meta-openembedded/meta-networking
             bitbake-layers add-layer ../meta-openembedded/meta-filesystems
