@@ -120,6 +120,7 @@ Pre-built images are available from our CI:
 - `core-image-minimal` - Bare minimum bootable system
 - `core-image-full-cmdline` - CLI with common utilities
 - `core-image-weston` - Graphical desktop with Weston compositor
+- `quickdraw-demo-image` - Weston image with Quick Draw AI demo (auto-starts after boot)
 
 ---
 
