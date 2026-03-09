@@ -231,7 +231,7 @@ Or:
 
     zcat tmp/deploy/images/rzv2n-sr-som/core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz | dd of=/dev/sdX bs=1M iflag=fullblock oflag=direct status=progress
 
-For firmware flashing (BL2, FIP, Flash Writer), refer to the SolidRun [RZ/V2N SoM documentation](https://solidrun.atlassian.net/wiki/spaces/developer/pages/661307393/).
+For bootloader firmware flashing (BL2, FIP) on SPI NOR or eMMC — including serial download, U-Boot CLI, and Linux methods — see the [Firmware Flashing Guide](rzv2n_flashing_guide.md).
 
 ## Device Tree Overlays
 

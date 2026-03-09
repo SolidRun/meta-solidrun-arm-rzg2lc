@@ -315,9 +315,8 @@ zcat tmp/deploy/images/<machine>/core-image-full-cmdline-<machine>.rootfs.wic.gz
 
 #### Flash Firmware (BL2, FIP, Flash Writer)
 
-For detailed firmware flashing instructions, refer to SolidRun documentation:
-- **RZ/G2L, G2LC, G2UL, V2L:** [Documentation](https://solidrun.atlassian.net/wiki/spaces/developer/pages/286654475/)
-- **RZ/V2N:** [SoM Documentation](https://solidrun.atlassian.net/wiki/spaces/developer/pages/661307393/)
+- **RZ/G2L, G2LC, G2UL, V2L:** [SolidRun Documentation](https://solidrun.atlassian.net/wiki/spaces/developer/pages/286654475/)
+- **RZ/V2N:** See the [Firmware Flashing Guide](docs/rzv2n_flashing_guide.md) for all methods (serial download, U-Boot CLI, Linux) covering both SPI NOR and eMMC.
 
 ---
 
