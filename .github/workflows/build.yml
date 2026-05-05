@@ -458,6 +458,8 @@ jobs:
           echo "rzg2l_solidrun_demo_image_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzg2l-sr-som/solidrun-demo-image-rzg2l-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
           echo "rzv2l_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzv2l-sr-som/core-image-full-cmdline-rzv2l-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
           echo "rzv2l_solidrun_demo_image_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzv2l-sr-som/solidrun-demo-image-rzv2l-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
+          echo "rzv2n_core_image_full_cmdline_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzv2n-sr-som/core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
+          echo "rzv2n_core_image_weston_url=http://ciserver.ci:8000/cipublish/${{ needs.info.outputs.local_artifacts_path }}/rzv2n-sr-som/core-image-weston-rzv2n-sr-som.rootfs.wic.gz" >> "$GITHUB_OUTPUT"
 
       - name: Checkout LAVA action
         uses: actions/checkout@v4
@@ -528,6 +530,22 @@ jobs:
                 "tags": ["rz_v2l"],
                 "image_url": "${{ steps.dl_url.outputs.rzv2l_core_image_full_cmdline_url }}",
                 "description": "RZ/V2L Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              },
+              {
+                "device_type": "rz",
+                "tags": ["rz_v2n"],
+                "image_url": "${{ steps.dl_url.outputs.rzv2n_core_image_full_cmdline_url }}",
+                "description": "RZ/V2N Yocto - Core CLI - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
+                "compression": "gz",
+                "all_devices": false
+              },
+              {
+                "device_type": "rz",
+                "tags": ["rz_v2n"],
+                "image_url": "${{ steps.dl_url.outputs.rzv2n_core_image_weston_url }}",
+                "description": "RZ/V2N Yocto - Weston - meta-solidrun-arm-rzg2lc/${{ needs.info.outputs.build_ref }} (${{ needs.info.outputs.build_rev }})",
                 "compression": "gz",
                 "all_devices": false
               }
