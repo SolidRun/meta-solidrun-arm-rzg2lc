@@ -302,7 +302,12 @@ jobs:
         if: ${{ matrix.enable_ros2 }}
         shell: bash -e {0}
         run: |
-          git clone -b scarthgap https://github.com/ros/meta-ros.git
+          # Pin meta-ros to a SHA where generate-parameter-library and
+          # tl-expected versions are internally consistent; later scarthgap
+          # tips bump generate-parameter-library to 0.7.1 without adding
+          # tl-expected to bitbake DEPENDS, breaking do_rootfs.
+          git clone https://github.com/ros/meta-ros.git
+          git -C meta-ros checkout 4aaaf8b98b05374be6ee26d18920f6a5c3e4cbbb
           git clone https://github.com/renesas-rz/rzv2n_ros2.git
           cp -r rzv2n_ros2/meta-rz-features-ros/meta-rzv2-ros-humble .
 
