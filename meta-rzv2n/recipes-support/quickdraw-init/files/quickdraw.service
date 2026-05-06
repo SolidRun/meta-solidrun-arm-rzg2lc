@@ -1,0 +1,18 @@
+[Unit]
+Description=Quick Draw AI Demo Application
+After=weston.service
+Requires=weston.service
+
+[Service]
+Type=simple
+User=root
+Environment=WAYLAND_DISPLAY=wayland-1
+Environment=LD_LIBRARY_PATH=/opt/deploy_quick_draw_v1.2/lib
+WorkingDirectory=/opt/deploy_quick_draw_v1.2
+ExecStartPre=/bin/sh -c 'WUID=$(id -u weston); while [ ! -e /run/user/$WUID/wayland-1 ]; do sleep 1; done'
+ExecStart=/bin/sh -c 'export XDG_RUNTIME_DIR=/run/user/$(id -u weston); exec /opt/deploy_quick_draw_v1.2/run.sh'
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical.target

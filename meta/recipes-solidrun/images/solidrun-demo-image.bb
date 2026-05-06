@@ -19,6 +19,17 @@ IMAGE_INSTALL:append = " \
 	nano \
 	tzdata \
 	wget \
+	gstreamer1.0 \
+	gstreamer1.0-plugins-base \
+	gstreamer1.0-plugins-good \
+	gstreamer1.0-plugins-bad \
+	gstreamer1.0-plugins-bad-bayer \
+	gstreamer1.0-plugins-ugly \
+	libdrm \
+	libdrm-tests \
+	fb-test \
+	python3-pillow \
+	python3-numpy \
 "
 
 inherit ${@bb.utils.contains('BBFILE_COLLECTIONS', 'qt6-layer', 'populate_sdk_qt6', '', d)}

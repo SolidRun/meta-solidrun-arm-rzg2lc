@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: SolidRun <support@solidrun.com>
+Date: Mon, 17 Feb 2026 00:00:00 +0000
+Subject: [PATCH 1/2] media: rzg2l-cru: increase CSI-2 max width to 4095 for
+ 4K support
+
+The RZG2L_CSI2_MAX_WIDTH was hardcoded to 2800, which is appropriate for
+RZ/G2L but prevents 4K (3840x2160) resolution on RZ/V2N and RZ/V2H
+platforms. The CRU driver already has max_width=4095 for these SoCs, but
+the CSI-2 subdev set_fmt clamps the width to 2800, causing a pipeline
+mismatch (EPIPE) when streaming at 4K.
+
+Increase the CSI-2 max width to 4095 to match the CRU capability on
+newer platforms.
+
+Signed-off-by: SolidRun <support@solidrun.com>
+---
+ drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
+index 1111111..2222222 100644
+--- a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
++++ b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
+@@ -99,7 +99,7 @@
+
+ #define RZG2L_CSI2_MIN_WIDTH		320
+ #define RZG2L_CSI2_MIN_HEIGHT		240
+-#define RZG2L_CSI2_MAX_WIDTH		2800
++#define RZG2L_CSI2_MAX_WIDTH		4095
+ #define RZG2L_CSI2_MAX_HEIGHT		4095
+
+ #define RZG2L_CSI2_DEFAULT_WIDTH	RZG2L_CSI2_MIN_WIDTH
+--
+2.34.1
+

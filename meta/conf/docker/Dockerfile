@@ -15,7 +15,7 @@ ENV DEBIAN_FRONTEND noninteractive
 # Build tools
 RUN apt-get update && apt-get install -y apt-transport-https \
     gawk wget git diffstat \
-    unzip texinfo gcc build-essential chrpath \
+    unzip texinfo gcc gfortran build-essential chrpath \
     socat cpio python3 python3-pip python3-pexpect \
     xz-utils debianutils iputils-ping python3-git \
     python3-jinja2 libegl1-mesa libsdl1.2-dev \
