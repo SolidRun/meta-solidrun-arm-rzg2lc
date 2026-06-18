@@ -41,7 +41,7 @@ export PATH=~/.local/bin:$PATH
 
 # 3. Download Yocto recipes (requires ~150GB free space)
 mkdir yocto-rz && cd yocto-rz
-repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap_rzv2n_dev -m meta-solidrun-arm-rz.xml
+repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
 repo sync
 
 # 4. Setup build environment and add SolidRun layers
@@ -172,7 +172,7 @@ Create a new working directory and download the build recipes:
 
 ```bash
 mkdir yocto-rz && cd yocto-rz
-repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap_rzv2n_dev -m meta-solidrun-arm-rz.xml
+repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
 repo sync
 ```
 

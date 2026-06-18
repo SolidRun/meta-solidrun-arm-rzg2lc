@@ -25,7 +25,7 @@ For Podman:
 
 Start in a new empty directory with plenty of free disk space - at least 150GB. Then download the build recipes:
 
-    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap_rzv2n_dev -m meta-solidrun-arm-rz.xml
+    repo init -u https://github.com/SolidRun/meta-solidrun-arm-rzg2lc -b scarthgap -m meta-solidrun-arm-rz.xml
     repo sync
 
 ### Optional Proprietary Packages
