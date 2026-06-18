@@ -210,6 +210,7 @@ jobs:
             bitbake_targets:
               - core-image-full-cmdline
               - core-image-weston
+              - quickdraw-demo-image
             publish_artifacts:
               - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.bmap
               - core-image-full-cmdline-rzv2n-sr-som.rootfs.wic.gz
@@ -217,6 +218,9 @@ jobs:
               - core-image-weston-rzv2n-sr-som.rootfs.wic.bmap
               - core-image-weston-rzv2n-sr-som.rootfs.wic.gz
               - core-image-weston-rzv2n-sr-som.rootfs.manifest
+              - quickdraw-demo-image-rzv2n-sr-som.rootfs.wic.bmap
+              - quickdraw-demo-image-rzv2n-sr-som.rootfs.wic.gz
+              - quickdraw-demo-image-rzv2n-sr-som.rootfs.manifest
               - r9a09g056n48-hummingboard-iiot.dtb
               - r9a09g056n48-rzv2n-evk.dtb
               - r9a09g056n48-solidsense-aiot.dtb
