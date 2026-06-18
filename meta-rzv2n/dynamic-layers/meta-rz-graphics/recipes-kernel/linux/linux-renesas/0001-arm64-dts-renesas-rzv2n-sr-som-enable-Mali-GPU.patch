@@ -1,0 +1,63 @@
+From 3084948563fe48220a65826107e600e5449992f2 Mon Sep 17 00:00:00 2001
+From: Yazan shhady <yazan.shhady@solidrun.com>
+Date: Mon, 16 Feb 2026 17:18:28 +0200
+Subject: [PATCH] arm64: dts: renesas: rzv2n-sr-som: enable Mali GPU
+
+Enable the Mali-G31 Bifrost GPU on the RZ/V2N SolidRun SoM:
+
+- Add a fixed 0.8V regulator for the GPU power supply
+- Enable the GPU node with mali-supply reference
+- Remove power-domains from the GPU node to work around a driver
+  probe issue (same workaround applied to RZ/G2L and RZ/V2L)
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+ arch/arm64/boot/dts/renesas/r9a09g056.dtsi    |  1 -
+ arch/arm64/boot/dts/renesas/rzv2n-sr-som.dtsi | 15 +++++++++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/renesas/r9a09g056.dtsi b/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
+index 70cc5fc22..8b7fce0e0 100644
+--- a/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
++++ b/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
+@@ -1659,7 +1659,6 @@
+ 				 <&cpg 0xde>,
+ 				 <&cpg 0xdf>;
+ 			reset-names = "rst", "axi_rst", "ace_rst";
+-			power-domains = <&cpg>;
+ 			operating-points-v2 = <&gpu_opp_table>;
+ 			status = "disabled";
+ 		};
+diff --git a/arch/arm64/boot/dts/renesas/rzv2n-sr-som.dtsi b/arch/arm64/boot/dts/renesas/rzv2n-sr-som.dtsi
+index 6925b9746..89926c348 100644
+--- a/arch/arm64/boot/dts/renesas/rzv2n-sr-som.dtsi
++++ b/arch/arm64/boot/dts/renesas/rzv2n-sr-som.dtsi
+@@ -149,6 +149,16 @@
+ 		regulator-always-on;
+ 	};
+ 
++	/* reg_0p8v - GPU core voltage */
++	reg_0p8v: regulator-0p8v {
++		compatible = "regulator-fixed";
++		regulator-name = "fixed-0.8V";
++		regulator-min-microvolt = <800000>;
++		regulator-max-microvolt = <800000>;
++		regulator-boot-on;
++		regulator-always-on;
++	};
++
+ 	vccq_sdhi1: regulator-vccq-sdhi1 {
+ 		compatible = "regulator-gpio";
+ 		regulator-name = "SDHI1 VccQ";
+@@ -638,3 +648,8 @@
+ 	uart-has-rtscts;
+ 	status = "disabled";
+ };
++
++&gpu {
++	status = "okay";
++	mali-supply = <&reg_0p8v>;
++};
+-- 
+2.25.1
+

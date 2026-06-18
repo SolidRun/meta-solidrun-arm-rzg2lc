@@ -1,0 +1,105 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: SolidRun <support@solidrun.com>
+Date: Mon, 17 Feb 2026 00:00:00 +0000
+Subject: [PATCH 2/2] media: imx678: fix pixel rate and link freq for SDR
+ modes
+
+The IMX678 SDR modes incorrectly set pclk = link_freq[2] (1782 MHz),
+using the MIPI link frequency as the V4L2 pixel rate. The CSI-2 receiver
+uses V4L2_CID_PIXEL_RATE to calculate the per-lane data rate:
+
+  mbps = pixel_rate * bpp / (lanes * 1000000)
+
+With pclk=1782000000 and bpp=12, lanes=4:
+  mbps = 1782000000 * 12 / (4 * 1000000) = 5346 Mbps/lane
+  total = 5346 * 4 = 21384 Mbps > 7331 max -> "unsupported transfer rate"
+
+Fix by:
+1. Using link_freq_idx=0 (891 MHz) for SDR modes - the correct MIPI
+   clock frequency for 4K@30fps on 4-lane CSI-2 with 12-bit data.
+2. Setting pclk to the actual pixel rate:
+   pixel_rate = link_freq * 2 * lanes / bpp = 891M * 2 * 4 / 12 = 594M
+3. Lowering the V4L2_CID_PIXEL_RATE minimum to 1, since the actual
+   pixel rate (594M) is below the previous minimum of link_freq[0]
+   (891M).
+
+With these fixes:
+  mbps = 594000000 * 12 / (4 * 1000000) = 1782 Mbps/lane
+  total = 1782 * 4 = 7128 Mbps < 7331 max -> OK
+
+Signed-off-by: SolidRun <support@solidrun.com>
+---
+ drivers/media/i2c/imx678.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/media/i2c/imx678.c b/drivers/media/i2c/imx678.c
+index 3333333..4444444 100644
+--- a/drivers/media/i2c/imx678.c
++++ b/drivers/media/i2c/imx678.c
+@@ -2570,8 +2570,8 @@
+ 	.vblank_max = IMX678_MAX_VBLANK_4K,
+ 	.rhs1 = 0x0,
+ 	.rhs2 = 0x0,
+-	.link_freq_idx = 2,
+-	.pclk = link_freq[2],
++	.link_freq_idx = 0,
++	.pclk = 594000000,
+ 	.code = MEDIA_BUS_FMT_SRGGB12_1X12,
+ 	.dol = 1,
+ 	.reg_list = {
+@@ -2592,8 +2592,8 @@
+ 	.vblank_max = IMX678_MAX_VBLANK_4K,
+ 	.rhs1 = 0x0,
+ 	.rhs2 = 0x0,
+-	.link_freq_idx = 2,
+-	.pclk = link_freq[2],
++	.link_freq_idx = 0,
++	.pclk = 594000000,
+ 	.code = MEDIA_BUS_FMT_SRGGB12_1X12,
+ 	.dol = 1,
+ 	.reg_list = {
+@@ -2614,8 +2614,8 @@
+ 	.vblank_max = 132840,
+ 	.rhs1 = 0x0,
+ 	.rhs2 = 0x0,
+-	.link_freq_idx = 2,
+-	.pclk = link_freq[2],
++	.link_freq_idx = 0,
++	.pclk = 594000000,
+ 	.code = MEDIA_BUS_FMT_SRGGB12_1X12,
+ 	.dol = 1,
+ 	.reg_list = {
+@@ -2636,8 +2636,8 @@
+ 	.vblank_max = IMX678_MAX_VBLANK_4K,
+ 	.rhs1 = 0x0,
+ 	.rhs2 = 0x0,
+-	.link_freq_idx = 2,
+-	.pclk = link_freq[2],
++	.link_freq_idx = 0,
++	.pclk = 594000000,
+ 	.code = MEDIA_BUS_FMT_SRGGB12_1X12,
+ 	.dol = 1,
+ 	.reg_list = {
+@@ -2658,8 +2658,8 @@
+ 	.vblank_max = IMX678_MAX_VBLANK_4K,
+ 	.rhs1 = 0x0,
+ 	.rhs2 = 0x0,
+-	.link_freq_idx = 2,
+-	.pclk = link_freq[2],
++	.link_freq_idx = 0,
++	.pclk = 594000000,
+ 	.code = MEDIA_BUS_FMT_SRGGB12_1X12,
+ 	.dol = 1,
+ 	.reg_list = {
+@@ -4487,7 +4487,7 @@
+ 	imx678->pclk_ctrl = v4l2_ctrl_new_std(ctrl_hdlr,
+ 						&imx678_ctrl_ops,
+ 						V4L2_CID_PIXEL_RATE,
+-						link_freq[0],
++						1,
+ 						link_freq[ARRAY_SIZE(link_freq) - 1],
+ 						1,
+ 						mode->pclk);
+--
+2.34.1
+
