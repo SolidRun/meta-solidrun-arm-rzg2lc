@@ -224,6 +224,11 @@ jobs:
               - r9a09g056n48-hummingboard-iiot.dtb
               - r9a09g056n48-rzv2n-evk.dtb
               - r9a09g056n48-solidsense-aiot.dtb
+              - rzv2n-solidsense-aiot-csi-camera-imx678-j8.dtbo
+              - rzv2n-solidsense-aiot-csi-camera-imx678-j17.dtbo
+              - rzv2n-solidsense-aiot-addon-flash-card.dtbo
+              - rzv2n-solidsense-aiot-addon-flash-card-cam-j8.dtbo
+              - rzv2n-solidsense-aiot-addon-flash-card-cam-j17.dtbo
               - rzv2n-hummingboard-iiot-panel-dsi-WJ70N3TYJHMNG0.dtbo
               - rzv2n-hummingboard-iiot-csi-camera-imx678.dtbo
               - Image.gz
