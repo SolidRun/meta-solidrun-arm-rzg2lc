@@ -428,11 +428,21 @@ jobs:
           ARTIFACTS: ${{ join(matrix.publish_artifacts, ' ') }}
         run: |
             ls -lh build/tmp/deploy/images/$MACHINE/
-            mkdir -p deploy/$MACHINE
+            mkdir -p deploy/$MACHINE/bootloader deploy/$MACHINE/dtbs
             for file in $ARTIFACTS; do
-              cp -v -L build/tmp/deploy/images/$MACHINE/$file deploy/$MACHINE/
+              case "$file" in
+                *.dtb|*.dtbo)
+                  dest="deploy/$MACHINE/dtbs/" ;;
+                bl2_bp_*|fip-*|*.srec|Flash_Writer_*.mot)
+                  dest="deploy/$MACHINE/bootloader/" ;;
+                *)
+                  # rootfs images (kept at top level so the test_images URLs
+                  # resolve), kernel Image and modules
+                  dest="deploy/$MACHINE/" ;;
+              esac
+              cp -v -L build/tmp/deploy/images/$MACHINE/$file "$dest"
             done
-            ls -lh deploy/$MACHINE/
+            find deploy/$MACHINE -type f | sort
 
       - name: Deploy to the local minio storage
         if: ${{ (!cancelled()) && (steps.build_step.outcome == 'success') }}
