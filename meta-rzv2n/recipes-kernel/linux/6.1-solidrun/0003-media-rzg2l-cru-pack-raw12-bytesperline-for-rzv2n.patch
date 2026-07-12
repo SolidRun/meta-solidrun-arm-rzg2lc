@@ -1,0 +1,101 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yazan Shhady <yazan.shhady@solid-run.com>
+Date: Sun, 12 Jul 2026 20:00:00 +0000
+Subject: [PATCH] media: rzg2l-cru: pack RAW Bayer bytesperline for RZ/V2N
+
+The RZ/V2N CRU (RZV2H_CRU_TYPE, has_stride=true) writes RAW10/12/14 Bayer
+data to memory MIPI-packed: RAW12 is 2 pixels per 3 bytes, i.e.
+width * 12 / 8 bytes per line (5760 bytes for 3840 px), NOT the
+2-bytes-per-pixel (12-in-16) layout that v4l2_fill_pixfmt() assigns to the
+Sxxxx1{0,2,4} FourCCs.
+
+rzg2l_cru_set_slot_addr() programs the AMnIS image-stride register as
+bytesperline / RZG2L_CRU_STRIDE_ALIGN (128). With the 2 B/px bytesperline
+(7680) the DMA advances a full extra 1920 bytes per line, so every captured
+line is horizontally truncated and the frame is corrupt. YUV pass-through
+(UYVY, 2 B/px) is unaffected because its packing already matches
+bytesperline.
+
+Fix it the same way Renesas does in the RZ AI-SDK CRU driver
+(rzg2l_cru_format_bytesperline(), meta-rz-imx415): after v4l2_fill_pixfmt(),
+override the stride for the standard packed Bayer FourCCs to
+ALIGN(width * bpp / 8, 128) and recompute sizeimage. The custom
+V4L2_PIX_FMT_RAW_CRU* formats keep their native (unpacked) layout.
+
+With this, a 3840x2160 RG12 (SRGGB12) capture produces exactly
+3840*2160*3/2 = 12441600 bytes, matching the known-good Renesas RAW12
+capture; unpack with 2px/3B and demosaic in userspace.
+
+Ref: Renesas ticket MPU-4592, meta-rz-imx415 0001-add_imx415.patch.
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+diff --git a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
+index 652562bc5644..cbf92303a5e1 100644
+--- a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
++++ b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
+@@ -1380,6 +1380,42 @@ int rzg2l_cru_dma_register(struct rzg2l_cru_dev *cru)
+  * V4L2 stuff
+  */
+ 
++/*
++ * The RZ/V2N CRU writes RAW10/12/14 Bayer data MIPI-packed (RAW12 = 2 pixels
++ * per 3 bytes). Return the packed bytes-per-line, aligned to the CRU image
++ * stride unit, for the standard Sxxxx1{0,2,4} FourCCs; 0 for everything else
++ * (YUV/RGB and the native V4L2_PIX_FMT_RAW_CRU* formats keep their layout).
++ */
++static u32 rzg2l_cru_raw_packed_bytesperline(u32 pixelformat, u32 width)
++{
++	unsigned int bpp;
++
++	switch (pixelformat) {
++	case V4L2_PIX_FMT_SRGGB10:
++	case V4L2_PIX_FMT_SBGGR10:
++	case V4L2_PIX_FMT_SGBRG10:
++	case V4L2_PIX_FMT_SGRBG10:
++		bpp = 10;
++		break;
++	case V4L2_PIX_FMT_SRGGB12:
++	case V4L2_PIX_FMT_SBGGR12:
++	case V4L2_PIX_FMT_SGBRG12:
++	case V4L2_PIX_FMT_SGRBG12:
++		bpp = 12;
++		break;
++	case V4L2_PIX_FMT_SRGGB14:
++	case V4L2_PIX_FMT_SBGGR14:
++	case V4L2_PIX_FMT_SGBRG14:
++	case V4L2_PIX_FMT_SGRBG14:
++		bpp = 14;
++		break;
++	default:
++		return 0;
++	}
++
++	return ALIGN(width * bpp / 8, RZG2L_CRU_STRIDE_ALIGN);
++}
++
+ static void rzg2l_cru_format_align(struct rzg2l_cru_dev *cru,
+ 				   struct v4l2_pix_format *pix)
+ {
+@@ -1420,6 +1456,21 @@ static void rzg2l_cru_format_align(struct rzg2l_cru_dev *cru,
+ 
+ 	v4l2_fill_pixfmt(pix, pix->pixelformat, pix->width, pix->height);
+ 
++	/*
++	 * RZ/V2N CRU emits packed RAW Bayer; override the 2 B/px stride that
++	 * v4l2_fill_pixfmt() picked so AMnIS (bytesperline / 128) matches what
++	 * the CRU DMA actually writes, otherwise each line is truncated.
++	 */
++	{
++		u32 bpl = rzg2l_cru_raw_packed_bytesperline(pix->pixelformat,
++							    pix->width);
++
++		if (bpl) {
++			pix->bytesperline = bpl;
++			pix->sizeimage = ALIGN(bpl * pix->height, 512);
++		}
++	}
++
+ 	if (cru->is_statistics)
+ 		pix->sizeimage *= 2;
+ 
