@@ -7,6 +7,7 @@ COMPATIBLE_MACHINE = "rzv2n-sr-som"
 
 SRC_URI = "file://v4l2n-init-imx678-dev.sh \
            file://v4l2-init-imx678-raw.sh \
+           file://imx678-full-test.sh \
            file://imx678-raw12-diag.sh \
            file://imx678-raw12-analyze.py \
            file://debayer_raw12_to_bmp.py \
@@ -18,6 +19,7 @@ do_install() {
     install -d ${D}/root
     install -m 0755 v4l2n-init-imx678-dev.sh ${D}/root/v4l2n-init-imx678-dev.sh
     install -m 0755 v4l2-init-imx678-raw.sh  ${D}/root/v4l2-init-imx678-raw.sh
+    install -m 0755 imx678-full-test.sh      ${D}/root/imx678-full-test.sh
     install -m 0755 imx678-raw12-diag.sh     ${D}/root/imx678-raw12-diag.sh
     install -m 0755 imx678-raw12-analyze.py  ${D}/root/imx678-raw12-analyze.py
     install -m 0755 debayer_raw12_to_bmp.py  ${D}/root/debayer_raw12_to_bmp.py
@@ -25,6 +27,7 @@ do_install() {
 
 FILES:${PN} = "/root/v4l2n-init-imx678-dev.sh \
                /root/v4l2-init-imx678-raw.sh \
+               /root/imx678-full-test.sh \
                /root/imx678-raw12-diag.sh \
                /root/imx678-raw12-analyze.py \
                /root/debayer_raw12_to_bmp.py \

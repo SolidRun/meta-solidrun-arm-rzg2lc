@@ -28,6 +28,10 @@ media-ctl -d "$MEDIA_DEV" -l "'${CSI2}':1 -> '${CRU}':0 [1]" 2>/dev/null
 media-ctl -d "$MEDIA_DEV" -V "'${SENSOR}':0 [fmt:${MEDIA_FMT}/${RES} field:none]"
 media-ctl -d "$MEDIA_DEV" -V "'${CSI2}':0 [fmt:${MEDIA_FMT}/${RES} field:none]"
 media-ctl -d "$MEDIA_DEV" -V "'${CSI2}':1 [fmt:${MEDIA_FMT}/${RES} field:none]"
+# The CRU-IP pads do NOT auto-propagate on the mainline driver - set them too,
+# otherwise the CRU defaults to UYVY/1280x960 and the capture is garbage.
+media-ctl -d "$MEDIA_DEV" -V "'${CRU}':0 [fmt:${MEDIA_FMT}/${RES} field:none]"
+media-ctl -d "$MEDIA_DEV" -V "'${CRU}':1 [fmt:${MEDIA_FMT}/${RES} field:none]"
 
 v4l2-ctl -d "$VIDEO_DEV" --set-fmt-video=width=${W},height=${H},pixelformat=${V4L2_FMT}
 v4l2-ctl -d "$VIDEO_DEV" --get-fmt-video | sed 's/^/  /'
@@ -44,8 +48,12 @@ Capture one frame:
 Convert to BMP on the board (or copy to a host):
   ./debayer_raw12_to_bmp.py /tmp/imx678_${W}x${H}.raw --width ${W} --height ${H} --bayer rggb --outfile /tmp/imx678.bmp
 
-Live view (software debayer):
-  gst-launch-1.0 v4l2src device=${VIDEO_DEV} ! \\
-    video/x-bayer,format=rggb,width=${W},height=${H},bpp=12 ! \\
-    bayer2rgb ! videoconvert ! waylandsink sync=false
+Live view + more tests (packed RG12 needs a software unpack - bayer2rgb can't
+eat it directly). Use the full-test helper:
+  /root/imx678-full-test.sh stream-sw ${RES}   # software unpack -> Weston/DSI
+  /root/imx678-full-test.sh still     ${RES}   # one frame -> BMP -> Weston/DSI
+
+KNOWN LIMITATION: each line is currently truncated to ~58% (CSI-2/DPHY config
+gap on the mainline RZ/V2N driver - deferred). The captured frame is real but
+only the left ~58% is filled.
 EOF
