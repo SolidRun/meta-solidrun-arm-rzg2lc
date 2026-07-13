@@ -26,4 +26,5 @@ SRC_URI:append:rzv2n-sr-som = " \
     file://0002-media-rzg2l-cru-increase-CSI-2-max-width-to-4095.patch \
     file://0003-media-rzg2l-cru-pack-raw12-bytesperline-for-rzv2n.patch \
     file://0004-arm64-dts-r9a09g056-add-power-domains-to-csi2.patch \
+    file://0005-media-rzg2l-csi2-skip-lane-cap-check-on-rzv2h.patch \
 "

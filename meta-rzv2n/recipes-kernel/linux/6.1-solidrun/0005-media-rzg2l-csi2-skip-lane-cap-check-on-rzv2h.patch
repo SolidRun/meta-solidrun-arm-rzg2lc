@@ -1,0 +1,62 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yazan Shhady <yazan.shhady@solid-run.com>
+Date: Mon, 13 Jul 2026 15:00:00 +0000
+Subject: [PATCH] media: rzg2l-csi2: skip lane-capability check on RZ/V2H/V2N
+
+rzg2l_validate_csi2_lanes() reads CSI2nMCG.SDLN (offset 0x0, bits 11:8) as
+the CSI-2 module's maximum supported data-lane count. That capability
+field only exists on RZ/G2L. On RZ/V2H/V2N the CSI-2 uses a different
+register layout (the DPHY is programmed via the CRUm_* registers, see
+rzv2h_csi2_dphy_enable()), so the read returns bogus bits and the 4-lane
+IMX678 is wrongly rejected:
+
+  rzg2l-csi2 16010400.csi21: Failed to support 4 data lanes
+  rzg2l-csi2: probe of 16010400.csi21 failed with error -22
+
+The failed probe also leaves a dangling async notifier, which then
+crashes the sensor's v4l2_async_register_subdev (v4l2_async_find_match).
+
+Gate the capability read behind a new info flag (has_lane_cap_reg, set
+only for RZ/G2L). On RZ/V2H/V2N skip the HW check and trust the
+DT-validated lane count (already restricted to 1/2/4). The CSI-2 then
+probes and /dev/media0 appears.
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+diff --git a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
+index d1935ee62a73..c9751fe908b1 100644
+--- a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
++++ b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-csi2.c
+@@ -142,6 +142,8 @@ struct rzg2l_csi2_info {
+ 	const struct rzg2l_csi2_format *format;
+ 	unsigned int num_formats;
+ 	unsigned int max_width;
++	/* CSI2nMCG.SDLN lane-capability register only exists on RZ/G2L */
++	bool has_lane_cap_reg;
+ };
+ 
+ struct rzg2l_csi2_timings {
+@@ -544,6 +546,7 @@ static const struct rzg2l_csi2_info rzg2l_csi2_info = {
+ 	.dphy_enable = rzg2l_csi2_dphy_enable,
+ 	.dphy_disable = rzg2l_csi2_dphy_disable,
+ 	.has_system_clk = true,
++	.has_lane_cap_reg = true,
+ 	.format = rzg2l_csi2_formats,
+ 	.num_formats = ARRAY_SIZE(rzg2l_csi2_formats),
+ 	.max_width = 2800,
+@@ -995,6 +998,15 @@ static int rzg2l_validate_csi2_lanes(struct rzg2l_csi2 *csi2)
+ 		return -EINVAL;
+ 	}
+ 
++	/*
++	 * The CSI2nMCG.SDLN lane-capability field only exists on RZ/G2L. On
++	 * RZ/V2H/V2N the CSI-2 uses a different register layout (CRUm_* DPHY
++	 * regs), so this read returns bogus bits and wrongly rejects 4 lanes.
++	 * Skip the HW capability check there and trust the validated DT count.
++	 */
++	if (!csi2->info->has_lane_cap_reg)
++		return 0;
++
+ 	ret = pm_runtime_resume_and_get(csi2->dev);
+ 	if (ret)
+ 		return ret;
