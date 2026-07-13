@@ -1,0 +1,43 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yazan Shhady <yazan.shhady@solid-run.com>
+Date: Mon, 13 Jul 2026 14:00:00 +0000
+Subject: [PATCH] arm64: dts: r9a09g056: add power-domains to CSI-2 nodes
+
+The RZ/V2N CSI-2 receiver nodes (csi20, csi21) were missing
+"power-domains = <&cpg>", unlike every other CPG-clocked block (e.g. the
+CRU video1 node right next to them). On RZ/V2H/V2N the CPG is a genpd and
+the module clock is ungated via the power-domain on pm_runtime_get().
+
+rzg2l_csi2_pm_runtime_resume() only deasserts presetn; it does not enable
+the module clock. Without the power-domain the CSI-2 register block is
+never clocked, so rzg2l_validate_csi2_lanes() faults reading CSI2nMCG
+during probe:
+
+  Internal error: synchronous external abort
+  pc : rzg2l_csi2_probe+0x2a4/0x54c [rzg2l_csi2]
+
+Add the missing power-domain so runtime PM powers the block; the CSI-2
+probe then completes and /dev/media0 appears.
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+diff --git a/arch/arm64/boot/dts/renesas/r9a09g056.dtsi b/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
+index 70cc5fc22a15..908256b90c41 100644
+--- a/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
++++ b/arch/arm64/boot/dts/renesas/r9a09g056.dtsi
+@@ -2676,6 +2676,7 @@ csi20: csi20@16000400 {
+ 			resets = <&cpg 0xc5>,
+ 				 <&cpg 0xc7>;
+ 			reset-names = "presetn", "cmn-rstb";
++			power-domains = <&cpg>;
+ 			status = "disabled";
+ 
+ 			ports {
+@@ -2703,6 +2704,7 @@ csi21: csi21@16010400 {
+ 			resets = <&cpg 0xc8>,
+ 				 <&cpg 0xca>;
+ 			reset-names = "presetn", "cmn-rstb";
++			power-domains = <&cpg>;
+ 			status = "disabled";
+ 
+ 			ports {

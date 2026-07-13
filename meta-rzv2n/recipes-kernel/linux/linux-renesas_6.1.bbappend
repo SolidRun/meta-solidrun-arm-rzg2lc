@@ -18,8 +18,12 @@ SRC_URI:append:rzv2n-sr-som = " file://rzv2n-sr-som.cfg file://imx678.cfg "
 #   0002  CSI-2 max width 4095 (enables 4K; base kernel caps at 2800).
 #   0003  pack RAW Bayer bytesperline -> fixes the ~55%/line RAW12 truncation
 #         (Renesas MPU-4592). THE key fix.
+#   0004  add power-domains to the CSI-2 nodes -> fixes a synchronous external
+#         abort in rzg2l_csi2_probe (CSI-2 block was never clocked); required
+#         for /dev/media0 to appear.
 SRC_URI:append:rzv2n-sr-som = " \
     file://0001-media-imx678-rzv2n-camera-support.patch \
     file://0002-media-rzg2l-cru-increase-CSI-2-max-width-to-4095.patch \
     file://0003-media-rzg2l-cru-pack-raw12-bytesperline-for-rzv2n.patch \
+    file://0004-arm64-dts-r9a09g056-add-power-domains-to-csi2.patch \
 "
