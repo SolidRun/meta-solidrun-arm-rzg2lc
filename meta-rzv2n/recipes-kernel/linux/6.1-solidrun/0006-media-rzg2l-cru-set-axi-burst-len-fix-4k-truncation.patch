@@ -1,0 +1,56 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Yazan Shhady <yazan.shhady@solid-run.com>
+Date: Mon, 13 Jul 2026 16:00:00 +0000
+Subject: [PATCH] media: rzg2l-cru: set AXI burst length to fix 4K RAW12
+ per-line truncation
+
+On RZ/V2N, 4K RAW12 capture writes only ~58% of each line to memory (the
+rest is zeros) - the original "RAW12 truncated to ~55% per line" bug.
+Everything upstream (sensor, CSI-2, CRU-IP pads) is correct 3840x2160;
+the CRU DMA simply stops mid-line.
+
+Root cause: rzg2l_cru_initialize_axi() never programs AMnAXIATTR, so the
+CRU AXI master uses its reset (short) burst length and cannot drain the
+line FIFO fast enough at high pixel rates. The FIFO overflows partway
+through each line and the tail is lost.
+
+Set AMnAXIATTR.AXILEN to the maximum (0xf), the recommended setting - the
+same write the RZ AI-SDK CRU driver (meta-rz-imx415) performs. With this,
+4K RAW12 lines are captured in full.
+
+Signed-off-by: Yazan Shhady <yazan.shhady@solid-run.com>
+---
+diff --git a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-cru-regs.h b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-cru-regs.h
+index bb25813281bb..a5744eed0e9b 100644
+--- a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-cru-regs.h
++++ b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-cru-regs.h
+@@ -44,6 +44,8 @@
+ #define AMnIS_IS_MASK			GENMASK(14, 7)
+ #define AMnIS_IS(x)			((x) << 7)
+ 
++#define AMnAXIATTR_AXILEN		GENMASK(3, 0)
++
+ #define AMnAXISTP_AXI_STOP		BIT(0)
+ 
+ #define AMnAXISTPACK_AXI_STOP_ACK	BIT(0)
+diff --git a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
+index cbf92303a5e1..0e20d6fcb136 100644
+--- a/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
++++ b/drivers/media/platform/renesas/rzg2l-cru/rzg2l-video.c
+@@ -407,6 +407,16 @@ static void rzg2l_cru_initialize_axi(struct rzg2l_cru_dev *cru)
+ 		stride /= RZG2L_CRU_STRIDE_ALIGN;
+ 		amnis = rzg2l_cru_read(cru, AMnIS) & ~AMnIS_IS_MASK;
+ 		rzg2l_cru_write(cru, AMnIS, amnis | AMnIS_IS(stride));
++
++		/*
++		 * Set the AXI master burst length to the maximum (recommended)
++		 * so the CRU can drain its line FIFO fast enough. Without this
++		 * the FIFO overflows mid-line at high pixel rates (e.g. 4K
++		 * RAW12) and each line is truncated to ~58%. Matches the RZ
++		 * AI-SDK CRU driver.
++		 */
++		amnis = rzg2l_cru_read(cru, AMnAXIATTR) & ~AMnAXIATTR_AXILEN;
++		rzg2l_cru_write(cru, AMnAXIATTR, amnis | 0xf);
+ 	}
+ }
+ 
