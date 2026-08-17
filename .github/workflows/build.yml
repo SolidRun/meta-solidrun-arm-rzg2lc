@@ -93,6 +93,7 @@ jobs:
             enable_meta_rz_graphics: false
             enable_meta_rz_codecs: false
             enable_meta_rz_qt6: false
+            enable_meta_rz_security_g2l: true
             bitbake_targets:
               - core-image-full-cmdline
             publish_artifacts:
@@ -115,6 +116,7 @@ jobs:
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: false
             enable_meta_rz_qt6: true
+            enable_meta_rz_security_g2l: true
             bitbake_targets:
               - core-image-full-cmdline
               - solidrun-demo-image
@@ -145,6 +147,7 @@ jobs:
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: true
             enable_meta_rz_qt6: true
+            enable_meta_rz_security_g2l: true
             bitbake_targets:
               - core-image-full-cmdline
               - solidrun-demo-image
@@ -175,6 +178,7 @@ jobs:
             enable_meta_rz_graphics: true
             enable_meta_rz_codecs: true
             enable_meta_rz_qt6: true
+            enable_meta_rz_security_g2l: true
             bitbake_targets:
               - core-image-full-cmdline
               - solidrun-demo-image
@@ -205,6 +209,7 @@ jobs:
             enable_meta_rz_graphics: false
             enable_meta_rz_codecs: false
             enable_meta_rz_qt6: false
+            enable_meta_rz_security_v2n: true
             enable_meta_rz_features_v2n: true
             enable_ros2: true
             bitbake_targets:
@@ -281,6 +286,8 @@ jobs:
           META_RZ_GRAPHICS: ${{ matrix.enable_meta_rz_graphics }}
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
+          META_RZ_SECURITY_G2L: ${{ matrix.enable_meta_rz_security_g2l }}
+          META_RZ_SECURITY_V2N: ${{ matrix.enable_meta_rz_security_v2n }}
           META_RZ_FEATURES_V2N: ${{ matrix.enable_meta_rz_features_v2n }}
         run: |
           # meta-rz-graphics
@@ -302,6 +309,26 @@ jobs:
             s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0224Z00002ZJ_v4.0.0.2.zip
             unzip -j RTK0EF0224Z00002ZJ_v4.0.0.2.zip RTK0EF0224Z00002ZJ_v4.0.0.2/rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
             tar -xf rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
+          fi
+
+          # meta-rz-security for G2L
+          if [[ "$META_RZ_SECURITY_G2L" == "true" ]]; then
+            s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0121Z00000ZJ-02-v4.2.0.1.zip
+            unzip -j RTK0EF0121Z00000ZJ-02-v4.2.0.1.zip RTK0EF0121Z00000ZJ-02-v4.2.0.1/meta-rz-features_security.tar.gz
+            tar -xf meta-rz-features_security.tar.gz
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require include/optee-\${MACHINE}.inc$;include include/optee-\${MACHINE}.inc;g" {} \;
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require linux-renesas/linux-renesas-\${MACHINE}.inc$;include linux-renesas/linux-renesas-\${MACHINE}.inc;g" {} \;
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require firmware-pack-\${MACHINE}.inc$;include firmware-pack-\${MACHINE}.inc;g" {} \;
+          fi
+
+          # meta-rz-security for V2N
+          if [[ "$META_RZ_SECURITY_V2N" == "true" ]]; then
+            s3cmd --access_key="$ACCESS_KEY" --secret_key="$SECRET_KEY" --host="$HOST" --host-bucket="%(bucket)s.$HOST" get s3://$BUCKET/renesas/rz-g2lc/RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1.zip
+            unzip -j RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1.zip RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1/meta-rz-features_security.tar.gz
+            tar -xf meta-rz-features_security.tar.gz
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require include/optee-\${MACHINE}.inc$;include include/optee-\${MACHINE}.inc;g" {} \;
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require linux-renesas/linux-renesas-\${MACHINE}.inc$;include linux-renesas/linux-renesas-\${MACHINE}.inc;g" {} \;
+            find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require firmware-pack-\${MACHINE}.inc$;include firmware-pack-\${MACHINE}.inc;g" {} \;
           fi
 
           # meta-rz-features for V2N (combined graphics, codecs, drpai, opencv)
@@ -347,6 +374,8 @@ jobs:
           META_RZ_GRAPHICS: ${{ matrix.enable_meta_rz_graphics }}
           META_RZ_CODECS: ${{ matrix.enable_meta_rz_codecs }}
           META_RZ_QT6: ${{ matrix.enable_meta_rz_qt6 }}
+          META_RZ_SECURITY_G2L: ${{ matrix.enable_meta_rz_security_g2l }}
+          META_RZ_SECURITY_V2N: ${{ matrix.enable_meta_rz_security_v2n }}
           META_RZ_FEATURES_V2N: ${{ matrix.enable_meta_rz_features_v2n }}
           ROS2: ${{ matrix.enable_ros2 }}
         run: |
@@ -364,6 +393,11 @@ jobs:
               bitbake-layers add-layer ../meta-rz-qt6
               sed -i 's;^\(TUNE_FEATURES:remove = "crypto"\)$;# \1;g' ../meta-rz-qt6/conf/layer.conf
             fi
+            if [[ "$META_RZ_SECURITY_G2L" == "true" ]] || [[ "$META_RZ_SECURITY_V2N" == "true" ]]; then
+              bitbake-layers add-layer ../meta-rz-features/meta-rz-security
+              echo "ENABLE_SPD_OPTEE = \"1\"" >> conf/local.conf
+            fi
+
             if [[ "$META_RZ_FEATURES_V2N" == "true" ]]; then
               bitbake-layers add-layer ../meta-rz-features/meta-rz-graphics
               bitbake-layers add-layer ../meta-rz-features/meta-rz-codecs
@@ -406,6 +440,7 @@ jobs:
             export CACHE_DIR="$GITHUB_WORKSPACE/buildcache"
             export BB_ENV_PASSTHROUGH_ADDITIONS="$BB_ENV_PASSTHROUGH_ADDITIONS CACHE_DIR"
             bitbake -k $TARGETS
+            ls -lh tmp/deploy/images/$MACHINE/
         continue-on-error: true
 
       - name: Update cache on the server (build may have failed)
