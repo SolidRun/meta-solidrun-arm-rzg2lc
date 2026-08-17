@@ -368,11 +368,49 @@ tar -xvf rzg_bsp_qt6.8.3_v4.0.0.2.tar.gz
 
 Creates: `meta-qt6` and `meta-rz-qt6`
 
+**4a. Security Package - V4.2.0.1 (RZ/G2L | G2LC | G2UL)**
+
+Download from [RZ MPU Security Package (Linux OS)](https://www.renesas.com/en/software-tool/rz-mpu-security-package-linux-os):
+
+File: `RTK0EF0121Z00000ZJ-02-v4.2.0.1.zip`
+
+```bash
+unzip -j RTK0EF0121Z00000ZJ-02-v4.2.0.1.zip \
+  RTK0EF0121Z00000ZJ-02-v4.2.0.1/meta-rz-features_security.tar.gz
+tar -xvf meta-rz-features_security.tar.gz
+
+# disarm some harmless renesas evk failing include paths
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require include/optee-\${MACHINE}.inc$;include include/optee-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require linux-renesas/linux-renesas-\${MACHINE}.inc$;include linux-renesas/linux-renesas-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require firmware-pack-\${MACHINE}.inc$;include firmware-pack-\${MACHINE}.inc;g" {} \;
+```
+
+Creates: `meta-rz-features/meta-rz-security`
+
+**4b. Security Package - V4.2.0.1 (RZ/V2L)**
+
+Download from [RZ MPU Security Package (Linux OS)](https://www.renesas.com/en/software-tool/rz-mpu-security-package-linux-os):
+
+File: `RTK0EF0121Z00000ZJ-03-ai-sdk-v4.2.0.0.zip`
+
+```bash
+unzip -j RTK0EF0121Z00000ZJ-03-ai-sdk-v4.2.0.0.zip \
+  RTK0EF0121Z00000ZJ-03-ai-sdk-v4.2.0.0/meta-rz-features_security.tar.gz
+tar -xvf meta-rz-features_security.tar.gz
+
+# disarm some harmless renesas evk failing include paths
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require include/optee-\${MACHINE}.inc$;include include/optee-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require linux-renesas/linux-renesas-\${MACHINE}.inc$;include linux-renesas/linux-renesas-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require firmware-pack-\${MACHINE}.inc$;include firmware-pack-\${MACHINE}.inc;g" {} \;
+```
+
+Creates: `meta-rz-features/meta-rz-security`
+
 #### RZ/V2N Packages
 
 Download from [RZ/V2N AI SDK v6.00](https://renesas-rz.github.io/rzv_ai_sdk/6.00/howto_build_aisdk_v2n.html):
 
-**RZ/V2N AI SDK Source Code**
+**1. RZ/V2N AI SDK Source Code**
 
 File: `RTK0EF0189F06000SJ_linux-src.zip`
 
@@ -406,6 +444,25 @@ This provides:
 - `meta-rz-codecs` - Video codec and DRP library
 - `meta-rz-drpai` - DRP-AI accelerator support
 - `meta-rz-opencva` - OpenCV accelerator
+
+**2. Security Package - V4.2.0.1 (RZ/V2N)**
+
+Download from [RZ MPU Security Package (Linux OS)](https://www.renesas.com/en/software-tool/rz-mpu-security-package-linux-os):
+
+File: `RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1.zip`
+
+```bash
+unzip -j RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1.zip \
+  RTK0EF0121Z00000ZJ-07-ai-sdk-v4.2.0.1/meta-rz-features_security.tar.gz
+tar -xvf meta-rz-features_security.tar.gz
+
+# disarm some harmless renesas evk failing include paths
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require include/optee-\${MACHINE}.inc$;include include/optee-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require linux-renesas/linux-renesas-\${MACHINE}.inc$;include linux-renesas/linux-renesas-\${MACHINE}.inc;g" {} \;
+find meta-rz-features/meta-rz-security -type f -exec sed -i "s;^require firmware-pack-\${MACHINE}.inc$;include firmware-pack-\${MACHINE}.inc;g" {} \;
+```
+
+Creates: `meta-rz-features/meta-rz-security`
 
 ### Enabling Optional Features
 
